@@ -1,4 +1,4 @@
-{% extends 'vote/base.html' %}
+{% extends 'main/base.html' %}
 {% block title %}التصويت{% endblock %}
 
 {% block content %}
@@ -69,20 +69,18 @@
                             {% csrf_token %}
                             <input type="hidden" name="session_id" value="{{ data.session.id }}">
 
-                            <!-- قائمة المرشحين بشكل منظم -->
+                            <!-- قائمة المرشحين -->
                             <ul style="list-style: none; padding: 0; margin: 10px 0;">
                                 {% for option in data.options %}
                                     <li style="margin-bottom: 10px;">
-                                        <label style="display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; direction: rtl; font-size: 15px;">
+                                        <label style="display: flex; align-items: center; gap: 10px; direction: rtl; font-size: 15px;">
                                             <input type="radio" name="option" value="{{ option.id }}" required style="transform: scale(1.3);">
-                                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ option.text }}</span>
-                                        </label>                                        
-                                        
+                                            <span>{{ option.text }}</span>
+                                        </label>
                                     </li>
                                 {% endfor %}
                             </ul>
 
-                            <!-- زر التصويت -->
                             <button type="submit" class="vote-btn" style="
                                 background: #e53935;
                                 border: none;
