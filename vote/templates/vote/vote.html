@@ -1,7 +1,9 @@
 {% extends 'main/base.html' %}
+{% load tz %}
 {% block title %}التصويت{% endblock %}
 
 {% block content %}
+{% now "UTC" as now %}
 <div class="content">
 
     <!-- زر تسجيل الخروج -->
@@ -44,7 +46,12 @@
                         <p style="font-size: 14px; color: #ddd;">{{ data.session.description }}</p>
                     {% endif %}
 
-                    <p style="font-size: 13px;">⏰ <strong>ينتهي التصويت:</strong> {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
+                    {% if data.session.expires_at < now %}
+                        <p style="font-size: 13px; color: #f44336;"><strong>⛔ انتهت فترة التصويت</strong></p>
+                    {% else %}
+                        <p style="font-size: 13px;">⏰ <strong>ينتهي التصويت:</strong> {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
+                    {% endif %}
+
                     <p style="font-size: 13px;">📂 <strong>النوع:</strong> {{ data.session.category }}</p>
 
                     {% if data.already_voted %}
@@ -65,35 +72,41 @@
                         </ul>
 
                     {% else %}
-                        <form method="post" class="vote-form" style="margin-top: 10px;">
-                            {% csrf_token %}
-                            <input type="hidden" name="session_id" value="{{ data.session.id }}">
+                        {% if data.session.expires_at > now %}
+                            <form method="post" class="vote-form" style="margin-top: 10px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="session_id" value="{{ data.session.id }}">
 
-                            <!-- قائمة المرشحين -->
-                            <ul style="list-style: none; padding: 0; margin: 10px 0;">
-                                {% for option in data.options %}
-                                    <li style="margin-bottom: 10px;">
-                                        <label style="display: flex; align-items: center; gap: 10px; direction: rtl; font-size: 15px;">
-                                            <input type="radio" name="option" value="{{ option.id }}" required style="transform: scale(1.3);">
-                                            <span>{{ option.text }}</span>
-                                        </label>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                                <!-- قائمة المرشحين -->
+                                <ul style="list-style: none; padding: 0; margin: 10px 0;">
+                                    {% for option in data.options %}
+                                        <li style="margin-bottom: 10px;">
+                                            <label style="display: flex; align-items: center; gap: 10px; direction: rtl; font-size: 15px;">
+                                                <input type="radio" name="option" value="{{ option.id }}" required style="transform: scale(1.3);">
+                                                <span>{{ option.text }}</span>
+                                            </label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
 
-                            <button type="submit" class="vote-btn" style="
-                                background: #e53935;
-                                border: none;
-                                padding: 10px 20px;
-                                color: white;
-                                border-radius: 8px;
-                                font-weight: bold;
-                                cursor: pointer;
-                                transition: 0.3s;
-                            " onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'">
-                                تصويت
-                            </button>
-                        </form>
+                                <button type="submit" class="vote-btn" style="
+                                    background: #e53935;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    color: white;
+                                    border-radius: 8px;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    transition: 0.3s;
+                                " onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'">
+                                    تصويت
+                                </button>
+                            </form>
+                        {% else %}
+                            <p style="color: #f44336; font-weight: bold; text-align: center; margin-top: 15px;">
+                                ⛔ انتهت فترة التصويت.
+                            </p>
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endfor %}
