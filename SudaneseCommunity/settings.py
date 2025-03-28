@@ -1,4 +1,5 @@
 import os
+import mimetypes
 from pathlib import Path
 
 # تعريف BASE_DIR
@@ -8,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-your-secret-key'
 
 # يجب أن يكون False عند النشر على Render
-DEBUG = False  
+DEBUG = False
 
 ALLOWED_HOSTS = ['sudanesecommunitylondon.onrender.com', '127.0.0.1']
 
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <== هام لتفعيل static في Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -44,7 +46,7 @@ ROOT_URLCONF = 'SudaneseCommunity.urls'
 # القوالب
 TEMPLATES = [
     {
-       'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'main', 'templates'),
             os.path.join(BASE_DIR, 'vote', 'templates'),
@@ -63,7 +65,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SudaneseCommunity.wsgi.application'
 
-# قواعد البيانات (ستحتاج لتغييرها لـ PostgreSQL لاحقًا)
+# قاعدة البيانات (افتراضي)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -91,5 +93,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# إصلاح مشاكل تحميل ملفات js
+mimetypes.add_type("application/javascript", ".js", True)
+
+# دعم Whitenoise للـ static
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
