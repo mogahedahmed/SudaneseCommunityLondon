@@ -11,34 +11,34 @@ document.addEventListener("DOMContentLoaded", function () {
     let index = 0;
     const textElement = document.getElementById("changing-text");
 
-    // إضافة تأثير الانتقال للتلاشي
-    textElement.style.transition = "opacity 1s ease-in-out";
+    if (textElement) {
+        // إعداد التلاشي بتأثير سلس
+        textElement.style.transition = "opacity 0.6s ease-in-out";
 
-    function typeThenFade(text) {
-        textElement.textContent = "";
-        textElement.style.opacity = "1";
-        let charIndex = 0;
+        function typeThenFade(text) {
+            textElement.textContent = "";
+            textElement.style.opacity = "1";
+            let charIndex = 0;
 
-        function typeChar() {
-            if (charIndex < text.length) {
-                textElement.textContent += text.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeChar, 50); // سرعة كتابة الحروف
-            } else {
-                // بعد الانتهاء من الكتابة، انتظر قليلاً ثم أبدأ التلاشي
-                setTimeout(() => {
-                    textElement.style.opacity = "0";
-                    // بعد التلاشي، انتقل للعبارة التالية
+            function typeChar() {
+                if (charIndex < text.length) {
+                    textElement.textContent += text.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeChar, 30); // سرعة الحروف
+                } else {
                     setTimeout(() => {
-                        index = (index + 1) % texts.length;
-                        typeThenFade(texts[index]);
-                    }, 1000); // وقت التلاشي
-                }, 2000); // وقت ظهور العبارة قبل التلاشي
+                        textElement.style.opacity = "0";
+                        setTimeout(() => {
+                            index = (index + 1) % texts.length;
+                            typeThenFade(texts[index]);
+                        }, 800); // مدة التلاشي
+                    }, 2000); // مدة بقاء العبارة
+                }
             }
+
+            typeChar();
         }
 
-        typeChar();
+        typeThenFade(texts[index]);
     }
-
-    typeThenFade(texts[index]); // البداية
 });
