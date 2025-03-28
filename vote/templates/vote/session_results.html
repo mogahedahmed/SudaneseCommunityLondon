@@ -1,0 +1,32 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+{% block title %}نتائج التصويت - {{ session.title }}{% endblock %}
+
+{% block content %}
+<div style="direction: rtl; text-align: right;">
+    <h1>📊 نتائج التصويت: {{ session.title }}</h1>
+    <p><strong>نوع التصويت:</strong> {{ session.category }}</p>
+    <p><strong>تاريخ الانتهاء:</strong> {{ session.expires_at }}</p>
+    <hr>
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: 'Tahoma';">
+        <thead style="background-color: #d32f2f; color: white;">
+            <tr>
+                <th>اسم العضو</th>
+                <th>الخيار</th>
+                <th>الجلسة</th>
+                <th>التاريخ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vote in votes %}
+                <tr>
+                    <td>{{ vote.member_name }}</td>
+                    <td>{{ vote.option }}</td>
+                    <td>{{ vote.session }}</td>
+                    <td>{{ vote.timestamp|date:"Y-m-d H:i" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

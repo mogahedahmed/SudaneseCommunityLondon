@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}نظام التصويت - الجالية السودانية{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+</head>
+<body>
+
+    <header>
+        <h1>🗳️ نظام التصويت - الجالية السودانية</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">الصفحة الرئيسية</a></li>
+            <li><a href="{% url 'vote_login' %}">تسجيل الدخول للتصويت</a></li>
+            <li><a href="{% url 'vote_page' %}">صفحة التصويت</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>جميع الحقوق محفوظة للجالية السودانية بمدينة لندن اونتاريو ©2025</p>
+    </footer>
+
+</body>
+</html>

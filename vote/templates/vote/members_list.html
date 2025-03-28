@@ -1,0 +1,46 @@
+{% extends 'admin/base_site.html' %}
+{% block title %}قائمة الأعضاء{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom: 20px; text-align: right;">
+    <a href="{% url 'members_print' %}" target="_blank" class="button" style="background-color: #d32f2f; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">
+        🖨️ طباعة الأعضاء
+    </a>
+</div>
+
+<div style="direction: rtl;">
+    <h1>👥 قائمة الأعضاء</h1>
+    <a href="{% url 'export_members_excel' %}" class="button" style="margin-bottom: 15px; display: inline-block;">⬇️ تحميل Excel</a>
+    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <thead style="background: #333; color: white;">
+            <tr>
+                <th>رقم العضوية</th>
+                <th>الاسم الكامل</th>
+                <th>الهاتف</th>
+                <th>البريد</th>
+                <th>الجنس</th>
+                <th>العمر</th>
+                <th>الحالة الاجتماعية</th>
+                <th>عدد أفراد العائلة</th>
+                <th>أحقية التصويت</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr>
+                <td>{{ member.member_id }}</td>
+                <td>{{ member.full_name }}</td>
+                <td>{{ member.phone }}</td>
+                <td>{{ member.email }}</td>
+                <td>{{ member.gender }}</td>
+                <td>{{ member.age }}</td>
+                <td>{{ member.marital_status }}</td>
+                <td>{{ member.family_members }}</td>
+                <td>{{ member.can_vote }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

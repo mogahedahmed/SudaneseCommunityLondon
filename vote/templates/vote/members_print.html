@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+{% block title %}طباعة الأعضاء{% endblock %}
+{% block content %}
+<h2>🖨️ قائمة الأعضاء للطباعة</h2>
+<table border="1" cellpadding="10" cellspacing="0" style="width:100%; border-collapse:collapse;">
+    <thead style="background:#222; color:white;">
+        <tr>
+            <th>رقم العضوية</th>
+            <th>الاسم الكامل</th>
+            <th>البريد</th>
+            <th>الهاتف</th>
+            <th>العمر</th>
+            <th>الجنس</th>
+            <th>الحالة الاجتماعية</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+        <tr>
+            <td>{{ member.member_id }}</td>
+            <td>{{ member.full_name }}</td>
+            <td>{{ member.email }}</td>
+            <td>{{ member.phone }}</td>
+            <td>{{ member.age }}</td>
+            <td>{{ member.gender }}</td>
+            <td>{{ member.marital_status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

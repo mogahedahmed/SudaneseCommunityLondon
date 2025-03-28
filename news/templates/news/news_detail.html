@@ -1,0 +1,102 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ news.title }} - تفاصيل الخبر{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    📰 تفاصيل الخبر
+</div>
+
+<div class="news-detail-container">
+    <div class="news-detail-card">
+
+        <!-- العنوان والتاريخ -->
+        <h2 class="news-detail-title">{{ news.title }}</h2>
+        <p class="news-meta">🕒 {{ news.created_at|date:"Y-m-d H:i" }}</p>
+
+        <!-- الصورة إذا توفرت -->
+        {% if news.image %}
+            <img src="{{ news.image.url }}" alt="صورة الخبر" class="news-detail-img">
+        {% endif %}
+
+        <!-- محتوى الخبر -->
+        <div class="news-full-content">
+            {{ news.content|linebreaks }}
+        </div>
+
+        <!-- زر الرجوع -->
+        <div class="back-btn-container">
+            <a href="{% url 'news_by_category' news.category %}" class="back-button">← الرجوع للأخبار</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.news-detail-container {
+    display: flex;
+    justify-content: center;
+    padding: 30px 15px;
+    background: linear-gradient(to bottom, #000000cc, #000000dd);
+}
+
+.news-detail-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 25px;
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    color: white;
+    text-align: center;
+}
+
+.news-detail-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.news-meta {
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.news-detail-img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.news-full-content {
+    font-size: 18px;
+    line-height: 1.8;
+    text-align: right;
+    padding: 0 10px;
+    margin-bottom: 30px;
+}
+
+.back-btn-container {
+    text-align: left;
+}
+
+.back-button {
+    display: inline-block;
+    background-color: #c40000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+.back-button:hover {
+    background-color: #a00000;
+}
+</style>
+{% endblock %}

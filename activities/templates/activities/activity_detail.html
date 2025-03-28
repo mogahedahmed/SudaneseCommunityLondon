@@ -1,0 +1,62 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ activity.title }} - تفاصيل النشاط{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: auto; padding: 20px; direction: rtl;">
+
+    <div class="page-banner" style="font-size: 24px; margin-bottom: 20px;">
+        🗓️ تفاصيل النشاط
+    </div>
+
+    <div class="news-detail-card" style="
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        color: white;
+        text-align: center;
+    ">
+
+        <!-- العنوان والتاريخ -->
+        <h2 class="news-detail-title" style="font-size: 26px; font-weight: bold; margin-bottom: 10px;">
+            {{ activity.title }}
+        </h2>
+        <p class="news-meta" style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+            📅 {{ activity.date }}
+        </p>
+
+        <!-- الصورة -->
+        {% if activity.image %}
+            <img src="{{ activity.image.url }}" alt="صورة النشاط" style="
+                width: 100%;
+                max-height: 400px;
+                object-fit: cover;
+                border-radius: 10px;
+                margin-bottom: 20px;
+            ">
+        {% endif %}
+
+        <!-- المحتوى -->
+        <div class="news-full-content" style="font-size: 18px; line-height: 1.8; text-align: right; padding: 0 10px; margin-bottom: 30px;">
+            {{ activity.description|linebreaks }}
+        </div>
+
+        <!-- زر الرجوع -->
+        <div class="back-btn-container" style="text-align: left;">
+            <a href="{% url 'activities' %}" style="
+                display: inline-block;
+                background-color: #c40000;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: bold;
+                transition: background 0.3s;
+            " onmouseover="this.style.background='#a00000'" onmouseout="this.style.background='#c40000'">← الرجوع للأنشطة</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

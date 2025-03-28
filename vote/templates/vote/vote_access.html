@@ -1,0 +1,47 @@
+{% extends 'vote/base.html' %}
+
+{% block title %}التصويت{% endblock %}
+
+{% block content %}
+<div class="vote-section">
+    <h2>{{ session.title }}</h2>
+    {% if session.description %}
+        <p>{{ session.description }}</p>
+    {% endif %}
+    <p><strong>ينتهي التصويت في:</strong> {{ session.expires_at|date:"Y-m-d H:i" }}</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% if already_voted %}
+        <h3>لقد قمت بالتصويت مسبقًا ✅</h3>
+        <h4>نتائج التصويت الحالية:</h4>
+        <ul>
+            {% for result in results %}
+                {% with percent=result.count|divisibleby:total_votes|floatformat:2 %}
+                    <li>
+                        {{ result.option__text }} - 
+                        {{ result.count }} صوت ({{ result.count|divisibleby:total_votes|floatformat:2 }}%)
+                    </li>
+                {% endwith %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <form method="post" class="vote-form">
+            {% csrf_token %}
+            {% for option in options %}
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="option" value="{{ option.id }}" required>
+                        {{ option.text }}
+                    </label>
+                </div>
+            {% endfor %}
+            <button type="submit" class="vote-btn">تصويت</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}الجالية السودانية - لندن أونتاريو{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+    <script src="{% static 'main/js/script.js' %}" defer></script>
+</head>
+<body>
+
+<!-- الهيدر -->
+<header>
+    <h1>الجالية السودانية في مدينة لندن اونتاريو</h1>
+    <p>مرحباً بالسادة الأعضاء والزوار</p>
+</header>
+
+<!-- شريط التنقل -->
+<nav>
+    <ul>
+        <li><a href="{% url 'home' %}">الصفحة الرئيسية</a></li>
+        <li class="dropdown">
+            <a href="#">الأخبار ▾</a>
+            <ul class="dropdown-menu">
+                <li><a href="{% url 'news_by_category' 'فرص عمل' %}">فرص عمل</a></li>
+                <li><a href="{% url 'news_by_category' 'أخبار الوفيات' %}">أخبار الوفيات</a></li>
+                <li><a href="{% url 'news_by_category' 'أخبار رياضية' %}">أخبار رياضية</a></li>
+                <li><a href="{% url 'news_by_category' 'أخبار الجالية' %}">أخبار الجالية</a></li>
+            </ul>
+        </li>
+        <li><a href="{% url 'activities' %}">الأنشطة الحالية</a></li>
+        <li><a href="{% url 'vote_login' %}">التصويت</a></li>
+        <li><a href="{% url 'regulations' %}">اللوائح والقوانين التنظيمية</a></li>
+        <li><a href="{% url 'contact' %}">تواصل معنا</a></li>
+    </ul>
+</nav>
+
+<!-- محتوى الصفحة -->
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- الفوتر -->
+<footer style="background-color:#111; color:white; text-align:center; padding:10px; margin-top:30px;">
+    جميع الحقوق محفوظة للجالية السودانية بمدينة لندن اونتاريو © 2025
+</footer>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

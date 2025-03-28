@@ -1,0 +1,72 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ regulation.title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: auto; padding: 20px; direction: rtl;">
+
+    <div class="page-banner" style="font-size: 24px; margin-bottom: 20px;">
+        📚 تفاصيل اللائحة
+    </div>
+
+    <div class="news-detail-card" style="
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        color: white;
+        text-align: center;
+    ">
+
+        <!-- العنوان والتاريخ -->
+        <h2 class="news-detail-title" style="font-size: 26px; font-weight: bold; margin-bottom: 10px;">
+            {{ regulation.title }}
+        </h2>
+        <p class="news-meta" style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+            📅 {{ regulation.created_at|date:"Y-m-d" }}
+        </p>
+
+        <!-- المحتوى -->
+        {% if regulation.description %}
+        <div class="news-full-content" style="font-size: 18px; line-height: 1.8; text-align: right; padding: 0 10px; margin-bottom: 30px;">
+            {{ regulation.description|linebreaks }}
+        </div>
+        {% endif %}
+
+        <!-- عرض الملفات -->
+        {% for file in regulation.files.all %}
+            {% with file.file.url as file_url %}
+                {% if file_url|lower|slice:"-4:" == ".pdf" %}
+                    <iframe src="{{ file_url }}" width="100%" height="600px" style="border:1px solid #ccc; border-radius:8px; margin-bottom: 20px;"></iframe>
+                {% elif file_url|lower|slice:"-4:" == ".jpg" or file_url|lower|slice:"-5:" == ".jpeg" or file_url|lower|slice:"-4:" == ".png" %}
+                    <img src="{{ file_url }}" alt="ملف اللائحة" style="width: 100%; max-height: 600px; object-fit: contain; border-radius: 8px; margin-bottom: 20px;">
+                {% else %}
+                    <p style="text-align:center; margin-top: 20px;">
+                        <a href="{{ file_url }}" download style="color: red; font-weight: bold;">📥 تحميل الملف</a>
+                    </p>
+                {% endif %}
+            {% endwith %}
+        {% empty %}
+            <p style="color:red; font-size:16px;">لم يتم إرفاق أي ملفات.</p>
+        {% endfor %}
+
+        <!-- زر الرجوع -->
+        <div class="back-btn-container" style="text-align: left; margin-top: 20px;">
+            <a href="{% url 'regulations' %}" style="
+                display: inline-block;
+                background-color: #c40000;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: bold;
+                transition: background 0.3s;
+            " onmouseover="this.style.background='#a00000'" onmouseout="this.style.background='#c40000'">
+                ← الرجوع للوائح
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
