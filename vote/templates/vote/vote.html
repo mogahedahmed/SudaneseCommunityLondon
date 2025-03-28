@@ -3,7 +3,10 @@
 {% block title %}التصويت{% endblock %}
 
 {% block content %}
-{% now "UTC" as now %}
+{% timezone "America/Toronto" %}
+    {% now "Y-m-d H:i" as local_now %}
+{% endtimezone %}
+
 <div class="content">
 
     <!-- زر تسجيل الخروج -->
@@ -25,13 +28,20 @@
         </div>
     {% endif %}
 
-    <!-- عرض جلسات التصويت -->
     {% if sessions_data|length == 0 %}
         <h3 style="color: #fff;">🚫 لا توجد جلسات تصويت نشطة حالياً</h3>
         <p style="color: #ccc;">يرجى الرجوع لاحقاً عند توفر جلسات تصويت.</p>
     {% else %}
         <div class="sessions-grid" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
             {% for data in sessions_data %}
+                {% timezone "America/Toronto" %}
+                    {% if data.session.expires_at|date:"Y-m-d H:i" < local_now %}
+                        {% with expired=True %}
+                    {% else %}
+                        {% with expired=False %}
+                    {% endif %}
+                {% endtimezone %}
+
                 <div class="vote-card" style="
                     background-color: rgba(0, 0, 0, 0.75);
                     border-radius: 16px;
@@ -46,7 +56,7 @@
                         <p style="font-size: 14px; color: #ddd;">{{ data.session.description }}</p>
                     {% endif %}
 
-                    {% if data.session.expires_at < now %}
+                    {% if expired %}
                         <p style="font-size: 13px; color: #f44336;"><strong>⛔ انتهت فترة التصويت</strong></p>
                     {% else %}
                         <p style="font-size: 13px;">⏰ <strong>ينتهي التصويت:</strong> {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
@@ -54,37 +64,22 @@
 
                     <p style="font-size: 13px;">📂 <strong>النوع:</strong> {{ data.session.category }}</p>
 
-                    {% if data.already_voted %}
-                        <p style="color: #4caf50; font-weight: bold;">✅ تم التصويت</p>
+                    {% if data.already_voted or can_vote == "لا" or expired %}
+                        {% if data.already_voted %}
+                            <p style="color: #4caf50; font-weight: bold;">✅ تم التصويت</p>
+                        {% endif %}
                         <h4 style="margin-top: 10px;">📊 النتائج:</h4>
                         <ul style="list-style: none; padding: 0;">
                             {% for result in data.results %}
                                 <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
                             {% endfor %}
                         </ul>
-
-                    {% elif data.session.expires_at <= now %}
-                        <p style="color: #f44336; font-weight: bold;">⛔ انتهت فترة التصويت</p>
-                        <h4 style="margin-top: 10px;">📊 النتائج:</h4>
-                        <ul style="list-style: none; padding: 0;">
-                            {% for result in data.results %}
-                                <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
-                            {% endfor %}
-                        </ul>
-
-                    {% elif can_vote == "لا" %}
-                        <h4 style="margin-top: 10px;">📊 النتائج:</h4>
-                        <ul style="list-style: none; padding: 0;">
-                            {% for result in data.results %}
-                                <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
-                            {% endfor %}
-                        </ul>
-
                     {% else %}
                         <form method="post" class="vote-form" style="margin-top: 10px;">
                             {% csrf_token %}
                             <input type="hidden" name="session_id" value="{{ data.session.id }}">
 
+                            <!-- قائمة المرشحين -->
                             <ul style="list-style: none; padding: 0; margin: 10px 0;">
                                 {% for option in data.options %}
                                     <li style="margin-bottom: 10px;">
@@ -110,6 +105,7 @@
                             </button>
                         </form>
                     {% endif %}
+                    {% endwith %}
                 </div>
             {% endfor %}
         </div>
