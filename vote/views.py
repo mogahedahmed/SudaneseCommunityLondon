@@ -9,6 +9,7 @@ from django.db.models import Count
 from .models import VotingSession, VotingOption, Vote, Member
 from xhtml2pdf import pisa
 import pandas as pd
+from django.utils.timezone import now  # ✅ ضروري
 
 # صفحة تسجيل الدخول
 def vote_login(request):
@@ -31,7 +32,7 @@ def vote_access(request):
             return render(request, 'vote/vote_login.html', {'error': 'رقم العضوية أو كلمة المرور غير صحيحة!'})
     return redirect('vote_login')
 
-# صفحة التصويت لجميع الجلسات النشطة
+# ✅ صفحة التصويت لجميع الجلسات (النشطة والمنتهية)
 def vote_page(request):
     member_id = request.session.get('member_id')
     full_name = request.session.get('full_name')
@@ -41,10 +42,9 @@ def vote_page(request):
     if not member_id or not phone:
         return redirect('vote_login')
 
-    sessions = VotingSession.objects.filter(expires_at__gt=timezone.now()).order_by('expires_at')
+    sessions = VotingSession.objects.all().order_by('expires_at')  # ✅ عرض كل الجلسات
     sessions_data = []
 
-    # منع التصويت يدويًا في حالة عدم الأهلية
     if request.method == "POST":
         if can_vote != "نعم":
             messages.error(request, "❌ لا يُسمح لك بالتصويت. يمكنك فقط مشاهدة النتائج.")
@@ -53,13 +53,20 @@ def vote_page(request):
         session_id = request.POST.get("session_id")
         option_id = request.POST.get("option")
         session = VotingSession.objects.get(id=session_id)
-        already_voted = Vote.objects.filter(session=session, member_id=member_id).exists()
 
+        # ✅ لا يُسمح بالتصويت بعد انتهاء الجلسة
+        if session.expires_at < now():
+            messages.warning(request, f"⏰ انتهى وقت التصويت على {session.title}.")
+            return redirect('vote_page')
+
+        already_voted = Vote.objects.filter(session=session, member_id=member_id).exists()
         if not already_voted:
             selected_option = VotingOption.objects.get(id=option_id, session=session)
             Vote.objects.create(session=session, option=selected_option, member_id=member_id, phone=phone)
             messages.success(request, f"✅ تم التصويت بنجاح في {session.title}")
-            return redirect('vote_page')
+        else:
+            messages.info(request, f"✅ لقد قمت بالتصويت مسبقًا في {session.title}")
+        return redirect('vote_page')
 
     for session in sessions:
         options = session.options.all()
@@ -88,6 +95,7 @@ def vote_page(request):
         'sessions_data': sessions_data,
         'full_name': full_name,
         'can_vote': can_vote,
+        'now': now(),  # ✅ تمرير الوقت الحالي للقالب
     })
 
 # تسجيل الخروج
@@ -145,12 +153,12 @@ def export_pdf(request):
 def vote_snapshot_view(request):
     return render(request, 'vote/vote_snapshot.html')
 
-# ✅ عرض الأعضاء في صفحة HTML
+# عرض الأعضاء في صفحة HTML
 def members_list_view(request):
     members = Member.objects.all().order_by('full_name')
     return TemplateResponse(request, 'vote/members_list.html', {'members': members})
 
-# ✅ تصدير الأعضاء إلى Excel
+# تصدير الأعضاء إلى Excel
 def export_members_excel(request):
     members = Member.objects.all().order_by('full_name')
     data = []
