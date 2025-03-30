@@ -25,7 +25,7 @@ class MemberAdmin(admin.ModelAdmin):
     list_display = (
         'member_id', 'full_name', 'email', 'phone', 'gender',
         'age', 'marital_status', 'family_members', 'can_vote',
-        'print_button'  # ← هذا السطر يضيف الزر
+        'print_button'
     )
     search_fields = ('member_id', 'full_name', 'email', 'phone')
     list_filter = ('gender', 'marital_status', 'can_vote')
@@ -142,7 +142,7 @@ def cancel_vote(modeladmin, request, queryset):
 
 
 class VotingSessionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'expires_at', 'created_at', 'view_results_link')
+    list_display = ('title', 'category', 'start_at', 'expires_at', 'view_results_link')
     inlines = [VotingOptionInline, VoteInline]
 
     def view_results_link(self, obj):

@@ -12,7 +12,6 @@ class Member(models.Model):
     marital_status = models.CharField(max_length=20, choices=[('أعزب', 'أعزب'), ('متزوج', 'متزوج')])
     family_members = models.PositiveIntegerField(default=0)
 
-    # ✅ حقل أحقية التصويت
     CAN_VOTE_CHOICES = [('نعم', 'نعم'), ('لا', 'لا')]
     can_vote = models.CharField(max_length=5, choices=CAN_VOTE_CHOICES, default='نعم', verbose_name="أحقية التصويت")
 
@@ -40,14 +39,13 @@ class VotingSession(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, verbose_name="نوع التصويت (اكتب يدويًا)")
-    
-    # ✅ تم إضافة هذا الحقل لعرض تاريخ بداية التصويت
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    expires_at = models.DateTimeField()
+
+    # ✅ تمت إضافة حقل وقت بداية التصويت
+    start_at = models.DateTimeField(default=timezone.now, verbose_name="وقت بداية التصويت")
+    expires_at = models.DateTimeField(verbose_name="وقت انتهاء التصويت")
 
     def is_active(self):
-        return timezone.now() < self.expires_at
+        return self.start_at <= timezone.now() < self.expires_at
 
     def __str__(self):
         return f"{self.title} ({self.category})"
