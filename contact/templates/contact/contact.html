@@ -21,19 +21,19 @@
 ">
     <ul style="list-style: none; padding: 0;">
         <li>📧 <strong>البريد الإلكتروني:</strong>
-            <a href="mailto:info@example.com" style="color:#90caf9; text-decoration: none;">
-                info@example.com
+            <a href="mailto:{{ contact.email }}" style="color:#90caf9; text-decoration: none;">
+                {{ contact.email }}
             </a>
         </li>
 
         <li>📞 <strong>الهاتف:</strong>
             <span style="direction: ltr; unicode-bidi: embed; color: #aed581; font-weight: bold;">
-                +1 226 504 1708
+                {{ contact.phone }}
             </span>
         </li>
 
         <li>💬 <strong>واتساب:</strong>
-            <a href="https://wa.me/12265041708?text=السلام عليكم، أود الاستفسار عن خدمات الجالية." 
+            <a href="{{ contact.whatsapp_link }}" 
                target="_blank" 
                style="color:#80deea; text-decoration: none;">
                اضغط هنا للمحادثة
@@ -41,11 +41,10 @@
         </li>
 
         <li>📍 <strong>العنوان:</strong>
-            <a href="https://www.google.com/maps/search/?api=1&query=360+Springbank+Dr,+London,+ON+N6J+1G7"
-               target="_blank" 
+            <a href="https://maps.google.com/?q={{ contact.address|urlencode }}"
                style="color:#f48fb1; text-decoration: none;">
                 <span style="direction: ltr; unicode-bidi: embed;">
-                    360 Springbank Dr, London, ON N6J 1G7
+                    {{ contact.address }}
                 </span>
             </a>
         </li>
