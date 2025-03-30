@@ -40,6 +40,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Middleware لتسجيل خروج المستخدم عند إغلاق المتصفح
+    'vote.middleware.LogoutOnBrowserCloseMiddleware',
 ]
 
 ROOT_URLCONF = 'SudaneseCommunity.urls'

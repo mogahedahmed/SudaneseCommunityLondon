@@ -24,11 +24,21 @@ def vote_access(request):
 
         try:
             member = Member.objects.get(member_id=member_id, password=password)
+
+            if member.is_logged_in:
+                messages.error(request, "⚠️ أنت متصل حاليًا بصفحة التصويت من جهاز آخر. الرجاء تسجيل الخروج ثم معاودة المحاولة.")
+                return redirect('vote_login')
+
             request.session['member_id'] = member.member_id
             request.session['full_name'] = member.full_name
             request.session['phone'] = member.phone
             request.session['can_vote'] = member.can_vote
+
+            member.is_logged_in = True
+            member.save()
+
             return redirect('vote_page')
+
         except Member.DoesNotExist:
             messages.error(request, "❌ رقم العضوية أو كلمة المرور غير صحيحة.")
             return redirect('vote_login')
@@ -118,14 +128,6 @@ def vote_page(request):
         'now': now(),
     })
 
-
-# تسجيل الخروج
-def logout_view(request):
-    request.session.flush()
-    messages.info(request, "تم تسجيل الخروج بنجاح.")
-    return redirect('vote_login')
-
-
 # تصدير نتائج أول جلسة نشطة إلى Excel
 def export_excel(request):
     session = VotingSession.objects.filter(expires_at__gt=timezone.now()).order_by('expires_at').first()
@@ -213,3 +215,17 @@ def export_members_excel(request):
 def members_print_view(request):
     members = Member.objects.all()
     return render(request, 'vote/members_print.html', {'members': members})
+
+def logout_view(request):
+    member_id = request.session.get('member_id')
+    if member_id:
+        try:
+            member = Member.objects.get(member_id=member_id)
+            member.is_logged_in = False
+            member.save()
+        except Member.DoesNotExist:
+            pass  # في حالة عدم وجود العضو لا نفعل شيء
+
+    request.session.flush()
+    messages.info(request, "تم تسجيل الخروج بنجاح.")
+    return redirect('vote_login')

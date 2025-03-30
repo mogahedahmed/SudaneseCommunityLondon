@@ -15,6 +15,9 @@ class Member(models.Model):
     CAN_VOTE_CHOICES = [('نعم', 'نعم'), ('لا', 'لا')]
     can_vote = models.CharField(max_length=5, choices=CAN_VOTE_CHOICES, default='نعم', verbose_name="أحقية التصويت")
 
+    # ✅ حقل جديد لتتبع حالة تسجيل دخول العضو
+    is_logged_in = models.BooleanField(default=False, verbose_name="حالة تسجيل الدخول")
+
     def __str__(self):
         return f"{self.full_name} ({self.member_id})"
 
@@ -40,7 +43,6 @@ class VotingSession(models.Model):
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, verbose_name="نوع التصويت (اكتب يدويًا)")
 
-    # ✅ تمت إضافة حقل وقت بداية التصويت
     start_at = models.DateTimeField(default=timezone.now, verbose_name="وقت بداية التصويت")
     expires_at = models.DateTimeField(verbose_name="وقت انتهاء التصويت")
 
