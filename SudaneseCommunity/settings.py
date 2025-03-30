@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-your-secret-key'
 
 # يجب أن يكون False عند النشر على Render
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['sudanesecommunitylondon.onrender.com', '127.0.0.1']
 
