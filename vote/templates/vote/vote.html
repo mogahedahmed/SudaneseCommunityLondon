@@ -1,91 +1,83 @@
-{% if data.session.expires_at < now %}
-    <!-- التصويت منتهي -->
-    <div class="vote-closed-alert">
-        ⏰ انتهى وقت التصويت لهذه الجلسة. لا يمكنك التصويت، ولكن يمكنك مشاهدة النتائج أدناه.
-    </div>
-    <h4 style="margin-top: 10px;">📊 النتائج:</h4>
-    <ul style="list-style: none; padding: 0;">
-        {% for result in data.results %}
-            <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
-        {% endfor %}
-    </ul>
-    <p style="font-size: 12px; color: #ccc; margin-top: 8px;">👥 عدد المصوتين: {{ data.total_votes }}</p>
+{% extends 'vote/base.html' %}
 
-{% elif data.session.start_at > now %}
-    <!-- التصويت لم يبدأ بعد -->
-    <div class="vote-not-started-alert" style="background: #fff3cd; padding: 12px; border: 1px solid #ffeeba; border-radius: 8px; color: #856404;">
-        ⏳ التصويت لم يبدأ بعد. يبدأ في: {{ data.session.start_at|date:"Y-m-d H:i" }}
-        <br>
-        ⏱️ العد التنازلي: <span id="countdown-{{ forloop.counter }}"></span>
-    </div>
-    <script>
-        const countdownEl{{ forloop.counter }} = document.getElementById("countdown-{{ forloop.counter }}");
-        const targetTime{{ forloop.counter }} = new Date("{{ data.session.start_at|date:'Y-m-d H:i:s' }}").getTime();
+{% block title %}التصويت{% endblock %}
 
-        const timer{{ forloop.counter }} = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = targetTime{{ forloop.counter }} - now;
+{% block content %}
+<div class="vote-section">
+    <h2>صفحة التصويت 🗳️</h2>
 
-            if (distance <= 0) {
-                clearInterval(timer{{ forloop.counter }});
-                countdownEl{{ forloop.counter }}.innerHTML = "بدأ التصويت!";
-                location.reload(); // إعادة تحميل الصفحة تلقائيًا
-            } else {
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                countdownEl{{ forloop.counter }}.innerHTML = hours + "س " + minutes + "د " + seconds + "ث ";
-            }
-        }, 1000);
-    </script>
+    {% for data in sessions_data %}
+        <div class="vote-session-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <h3>{{ data.session.title }}</h3>
+            {% if data.session.description %}
+                <p>{{ data.session.description }}</p>
+            {% endif %}
+            <p>
+                ⏳ مدة التصويت: من {{ data.session.start_at|date:"Y-m-d H:i" }} إلى {{ data.session.expires_at|date:"Y-m-d H:i" }}
+            </p>
 
-{% elif data.already_voted %}
-    <!-- تم التصويت مسبقًا -->
-    <p style="color: #4caf50; font-weight: bold;">✅ تم التصويت</p>
-    <h4 style="margin-top: 10px;">📊 النتائج:</h4>
-    <ul style="list-style: none; padding: 0;">
-        {% for result in data.results %}
-            <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
-        {% endfor %}
-    </ul>
-    <p style="font-size: 12px; color: #ccc; margin-top: 8px;">👥 عدد المصوتين: {{ data.total_votes }}</p>
+            {% if data.session.expires_at < now %}
+                <!-- التصويت منتهي -->
+                <div class="vote-closed-alert" style="background: #f8d7da; padding: 10px; border-radius: 6px; border: 1px solid #f5c6cb; color: #721c24;">
+                    ⏰ انتهى وقت التصويت. يمكنك مشاهدة النتائج.
+                </div>
+                <h4>📊 النتائج:</h4>
+                <ul>
+                    {% for result in data.results %}
+                        <li>📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
+                    {% endfor %}
+                </ul>
+                <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
 
-{% elif can_vote == "لا" %}
-    <!-- غير مسموح له بالتصويت -->
-    <h4 style="margin-top: 10px;">📊 النتائج:</h4>
-    <ul style="list-style: none; padding: 0;">
-        {% for result in data.results %}
-            <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
-        {% endfor %}
-    </ul>
-    <p style="font-size: 12px; color: #ccc; margin-top: 8px;">👥 عدد المصوتين: {{ data.total_votes }}</p>
+            {% elif data.session.start_at > now %}
+                <!-- التصويت لم يبدأ بعد -->
+                <div class="vote-not-started-alert" style="background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; color: #856404;">
+                    ⏳ التصويت لم يبدأ بعد. يبدأ في: {{ data.session.start_at|date:"Y-m-d H:i" }}
+                </div>
 
-{% else %}
-    <!-- نموذج التصويت -->
-    <form method="post" class="vote-form" style="margin-top: 10px;">
-        {% csrf_token %}
-        <input type="hidden" name="session_id" value="{{ data.session.id }}">
-        <ul style="list-style: none; padding: 0; margin: 10px 0;">
-            {% for option in data.options %}
-                <li style="margin-bottom: 10px;">
-                    <label style="display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; direction: rtl; font-size: 15px;">
-                        <input type="radio" name="option" value="{{ option.id }}" required style="transform: scale(1.3);">
-                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ option.text }}</span>
-                    </label>
-                </li>
-            {% endfor %}
-        </ul>
-        <button type="submit" class="vote-btn" style="
-            background: #e53935;
-            border: none;
-            padding: 10px 20px;
-            color: white;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        " onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'">
-            تصويت
-        </button>
-    </form>
-{% endif %}
+            {% elif data.already_voted %}
+                <!-- تم التصويت مسبقًا -->
+                <p style="color: #4caf50; font-weight: bold;">✅ تم التصويت</p>
+                <h4>📊 النتائج:</h4>
+                <ul>
+                    {% for result in data.results %}
+                        <li>📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
+                    {% endfor %}
+                </ul>
+                <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
+
+            {% elif can_vote == "لا" %}
+                <!-- لا يسمح له بالتصويت -->
+                <div class="vote-not-allowed-alert" style="background: #f8d7da; padding: 10px; border-radius: 6px; border: 1px solid #f5c6cb; color: #721c24;">
+                    ❌ لا يُسمح لك بالتصويت، ولكن يمكنك مشاهدة النتائج.
+                </div>
+                <h4>📊 النتائج:</h4>
+                <ul>
+                    {% for result in data.results %}
+                        <li>📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
+                    {% endfor %}
+                </ul>
+                <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
+
+            {% else %}
+                <!-- نموذج التصويت -->
+                <form method="post" class="vote-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="session_id" value="{{ data.session.id }}">
+                    <ul>
+                        {% for option in data.options %}
+                            <li>
+                                <label>
+                                    <input type="radio" name="option" value="{{ option.id }}" required>
+                                    {{ option.text }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="submit" class="vote-btn">تصويت</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
