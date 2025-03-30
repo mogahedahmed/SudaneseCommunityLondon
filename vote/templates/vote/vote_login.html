@@ -6,6 +6,14 @@
 <div class="vote-section">
     <h2 class="vote-title">🗳️ الرجاء إدخال بياناتك للدخول إلى التصويت</h2>
 
+    {% if messages %}
+        {% for message in messages %}
+            <p class="vote-msg" style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %}; text-align: center;">
+                {{ message }}
+            </p>
+        {% endfor %}
+    {% endif %}
+
     {% if error %}
         <p class="vote-error" style="color: red; text-align: center;">{{ error }}</p>
     {% endif %}
@@ -14,13 +22,27 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="member_id">رقم العضوية:</label>
-            <input type="text" id="member_id" name="member_id" required placeholder="أدخل رقم عضويتك">
+            <input type="text" id="member_id" name="member_id" required placeholder="أدخل رقم عضويتك" value="{{ request.POST.member_id }}">
         </div>
-        <div class="form-group">
+
+        <div class="form-group" style="position: relative;">
             <label for="password">كلمة المرور:</label>
-            <input type="password" id="password" name="password" required placeholder="أدخل كلمة المرور">
+            <input type="password" id="password" name="password" required placeholder="أدخل كلمة المرور" style="padding-right: 40px;">
+            <span onclick="togglePassword()" style="position: absolute; top: 37px; right: 10px; cursor: pointer; color: #555;">👁️</span>
         </div>
+
         <button type="submit" class="vote-btn">دخول</button>
     </form>
 </div>
+
+<script>
+    function togglePassword() {
+        const passwordField = document.getElementById("password");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+</script>
 {% endblock %}

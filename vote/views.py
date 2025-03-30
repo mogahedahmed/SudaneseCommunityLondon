@@ -4,12 +4,11 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
-from django.utils.encoding import smart_str
 from django.db.models import Count
 from .models import VotingSession, VotingOption, Vote, Member
 from xhtml2pdf import pisa
 import pandas as pd
-from django.utils.timezone import now  # ✅ ضروري
+from django.utils.timezone import now
 
 # صفحة تسجيل الدخول
 def vote_login(request):
@@ -29,10 +28,12 @@ def vote_access(request):
             request.session['can_vote'] = member.can_vote
             return redirect('vote_page')
         except Member.DoesNotExist:
-            return render(request, 'vote/vote_login.html', {'error': 'رقم العضوية أو كلمة المرور غير صحيحة!'})
+            messages.error(request, "❌ رقم العضوية أو كلمة المرور غير صحيحة.")
+            return redirect('vote_login')
+
     return redirect('vote_login')
 
-# ✅ صفحة التصويت لجميع الجلسات (النشطة والمنتهية)
+# صفحة التصويت لجميع الجلسات
 def vote_page(request):
     member_id = request.session.get('member_id')
     full_name = request.session.get('full_name')
@@ -42,21 +43,24 @@ def vote_page(request):
     if not member_id or not phone:
         return redirect('vote_login')
 
-    sessions = VotingSession.objects.all().order_by('expires_at')  # ✅ عرض كل الجلسات
+    sessions = VotingSession.objects.all().order_by('expires_at')
     sessions_data = []
 
     if request.method == "POST":
-        if can_vote != "نعم":
-            messages.error(request, "❌ لا يُسمح لك بالتصويت. يمكنك فقط مشاهدة النتائج.")
-            return redirect('vote_page')
-
         session_id = request.POST.get("session_id")
         option_id = request.POST.get("option")
         session = VotingSession.objects.get(id=session_id)
 
-        # ✅ لا يُسمح بالتصويت بعد انتهاء الجلسة
+        if can_vote != "نعم":
+            messages.error(request, "❌ لا يُسمح لك بالتصويت. يمكنك فقط مشاهدة النتائج.")
+            return redirect('vote_page')
+
         if session.expires_at < now():
             messages.warning(request, f"⏰ انتهى وقت التصويت على {session.title}.")
+            return redirect('vote_page')
+
+        if session.start_at > now():
+            messages.warning(request, f"⏰ لم يبدأ التصويت على {session.title} بعد.")
             return redirect('vote_page')
 
         already_voted = Vote.objects.filter(session=session, member_id=member_id).exists()
@@ -95,7 +99,7 @@ def vote_page(request):
         'sessions_data': sessions_data,
         'full_name': full_name,
         'can_vote': can_vote,
-        'now': now(),  # ✅ تمرير الوقت الحالي للقالب
+        'now': now(),
     })
 
 # تسجيل الخروج
@@ -104,7 +108,7 @@ def logout_view(request):
     messages.info(request, "تم تسجيل الخروج بنجاح.")
     return redirect('vote_login')
 
-# تصدير نتائج أول جلسة نشطة إلى Excel
+# تصدير النتائج إلى Excel
 def export_excel(request):
     session = VotingSession.objects.filter(expires_at__gt=timezone.now()).order_by('expires_at').first()
     if not session:
@@ -138,8 +142,8 @@ def export_pdf(request):
         .order_by('-count')
     )
 
+    total = Vote.objects.filter(session=session).count()
     for r in results:
-        total = Vote.objects.filter(session=session).count()
         r["percent"] = round((r["count"] / total) * 100, 2) if total > 0 else 0
 
     template = get_template("vote/pdf_template.html")
@@ -149,7 +153,7 @@ def export_pdf(request):
     pisa.CreatePDF(html, dest=response)
     return response
 
-# عرض النسخة القابلة للطباعة من التصويت
+# نسخة الطباعة
 def vote_snapshot_view(request):
     return render(request, 'vote/vote_snapshot.html')
 
@@ -182,6 +186,7 @@ def export_members_excel(request):
     df.to_excel(response, index=False)
     return response
 
+# صفحة طباعة الأعضاء
 def members_print_view(request):
     members = Member.objects.all()
     return render(request, 'vote/members_print.html', {'members': members})
