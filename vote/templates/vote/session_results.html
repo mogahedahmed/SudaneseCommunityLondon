@@ -3,15 +3,32 @@
 {% block title %}نتائج التصويت - {{ session.title }}{% endblock %}
 
 {% block content %}
-<div style="direction: rtl; text-align: right;">
+<div style="direction: rtl; text-align: right; font-family: 'Tahoma';">
     <h1>📊 نتائج التصويت: {{ session.title }}</h1>
-    
+
     <p><strong>نوع التصويت:</strong> {{ session.category }}</p>
     <p><strong>مدة التصويت:</strong> من {{ session.start_at|date:"Y-m-d H:i" }} إلى {{ session.expires_at|date:"Y-m-d H:i" }}</p>
-    
+
+    <div style="margin: 20px 0;">
+        <button onclick="window.print()" style="background: #444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin-left: 10px; cursor: pointer;">🖨️ طباعة</button>
+
+        <a href="{% url 'export_pdf' %}" target="_blank" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; margin-left: 10px;">
+            📄 تصدير إلى PDF
+        </a>
+
+        <a href="{% url 'export_excel' %}" target="_blank" style="background: #388e3c; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
+            📊 تصدير إلى Excel
+        </a>
+    </div>
+
     <hr>
 
-    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: 'Tahoma';">
+    <table border="1" cellpadding="10" cellspacing="0" style="
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        text-align: center;
+    ">
         <thead style="background-color: #d32f2f; color: white;">
             <tr>
                 <th>اسم العضو</th>

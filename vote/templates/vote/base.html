@@ -1,33 +1,169 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}نظام التصويت - الجالية السودانية{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+    <style>
+        body {
+            font-family: "Tahoma", sans-serif;
+            background-image: url('{% static "main/images/background.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+            margin: 0;
+        }
+
+        header {
+            background-color: #e53935;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+        }
+
+        nav {
+            background-color: #444;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            display: inline-block;
+            margin: 0 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1000px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.93);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background-color: #333;
+            color: #ccc;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+
+        .vote-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .vote-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .alert-message {
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+    </style>
 </head>
 <body>
 
     <header>
-        <h1>🗳️ نظام التصويت - الجالية السودانية</h1>
+        🗳️ نظام التصويت - الجالية السودانية بلندن أونتاريو
     </header>
 
     <nav>
         <ul>
-            <li><a href="{% url 'home' %}">الصفحة الرئيسية</a></li>
-            <li><a href="{% url 'vote_login' %}">تسجيل الدخول للتصويت</a></li>
-            <li><a href="{% url 'vote_page' %}">صفحة التصويت</a></li>
+            <li><a href="{% url 'home' %}">🏠 الصفحة الرئيسية</a></li>
+            <li><a href="{% url 'vote_login' %}">🔐 تسجيل الدخول</a></li>
+            <li><a href="{% url 'vote_page' %}">🗳️ التصويت</a></li>
         </ul>
     </nav>
 
     <main class="container">
+
+        <!-- ✅ عرض رسائل التنبيه -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-message alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 
     <footer>
-        <p>جميع الحقوق محفوظة للجالية السودانية بمدينة لندن اونتاريو ©2025</p>
+        جميع الحقوق محفوظة © الجالية السودانية بلندن أونتاريو 2025
     </footer>
+
+    <script>
+        // ✅ إخفاء التنبيه تلقائيًا بعد 4 ثوانٍ
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert-message');
+            alerts.forEach(alert => alert.style.display = 'none');
+        }, 4000);
+    </script>
 
 </body>
 </html>

@@ -5,12 +5,11 @@ from pathlib import Path
 # تعريف BASE_DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# مفتاح الأمان (يجب تغييره لاحقًا بمفتاح حقيقي)
+# مفتاح الأمان (غيّره قبل النشر الحقيقي)
 SECRET_KEY = 'django-insecure-your-secret-key'
 
-# يجب أن يكون False عند النشر على Render
+# Debug و Hosts
 DEBUG = True
-
 ALLOWED_HOSTS = ['sudanesecommunitylondon.onrender.com', '127.0.0.1']
 
 # التطبيقات المثبتة
@@ -21,6 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # التطبيقات الخاصة بك
     'main',
     'vote',
     'news',
@@ -29,10 +30,10 @@ INSTALLED_APPS = [
     'regulations',
 ]
 
-# Middleware
+# الوسطاء Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # <== هام لتفعيل static في Render
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # لدعم static في Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,7 +44,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'SudaneseCommunity.urls'
 
-# القوالب
+# إعدادات القوالب
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -65,7 +66,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SudaneseCommunity.wsgi.application'
 
-# قاعدة البيانات (افتراضي)
+# إعدادات قاعدة البيانات
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -73,7 +74,7 @@ DATABASES = {
     }
 }
 
-# كلمات المرور
+# إعدادات التحقق من كلمات المرور
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -81,23 +82,26 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# اللغة والوقت
 LANGUAGE_CODE = 'ar'
 TIME_ZONE = 'America/Toronto'
 USE_I18N = True
 USE_TZ = True
 
-# ملفات Static وMedia
+# إعدادات static
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'main', 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# إعدادات media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# إصلاح مشاكل تحميل ملفات js
+# إصلاح مشاكل تحميل ملفات js في بعض السيرفرات
 mimetypes.add_type("application/javascript", ".js", True)
 
-# دعم Whitenoise للـ static
+# Whitenoise لتجهيز ملفات static عند النشر
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# القيمة الافتراضية لحقل ID
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

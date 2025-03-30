@@ -10,9 +10,11 @@ from xhtml2pdf import pisa
 import pandas as pd
 from django.utils.timezone import now
 
+
 # صفحة تسجيل الدخول
 def vote_login(request):
     return render(request, 'vote/vote_login.html')
+
 
 # التحقق من العضو وتخزين معلومات الجلسة
 def vote_access(request):
@@ -33,6 +35,7 @@ def vote_access(request):
 
     return redirect('vote_login')
 
+
 # صفحة التصويت لجميع الجلسات
 def vote_page(request):
     member_id = request.session.get('member_id')
@@ -49,7 +52,17 @@ def vote_page(request):
     if request.method == "POST":
         session_id = request.POST.get("session_id")
         option_id = request.POST.get("option")
-        session = VotingSession.objects.get(id=session_id)
+
+        # ✅ التحقق من أن القيم موجودة
+        if not session_id or not option_id:
+            messages.error(request, "يرجى تحديد خيار تصويت صالح.")
+            return redirect('vote_page')
+
+        try:
+            session = VotingSession.objects.get(id=session_id)
+        except VotingSession.DoesNotExist:
+            messages.error(request, "جلسة التصويت غير موجودة.")
+            return redirect('vote_page')
 
         if can_vote != "نعم":
             messages.error(request, "❌ لا يُسمح لك بالتصويت. يمكنك فقط مشاهدة النتائج.")
@@ -65,9 +78,12 @@ def vote_page(request):
 
         already_voted = Vote.objects.filter(session=session, member_id=member_id).exists()
         if not already_voted:
-            selected_option = VotingOption.objects.get(id=option_id, session=session)
-            Vote.objects.create(session=session, option=selected_option, member_id=member_id, phone=phone)
-            messages.success(request, f"✅ تم التصويت بنجاح في {session.title}")
+            try:
+                selected_option = VotingOption.objects.get(id=option_id, session=session)
+                Vote.objects.create(session=session, option=selected_option, member_id=member_id, phone=phone)
+                messages.success(request, f"✅ تم التصويت بنجاح في {session.title}")
+            except VotingOption.DoesNotExist:
+                messages.error(request, "الخيار المحدد غير صالح.")
         else:
             messages.info(request, f"✅ لقد قمت بالتصويت مسبقًا في {session.title}")
         return redirect('vote_page')
@@ -102,13 +118,15 @@ def vote_page(request):
         'now': now(),
     })
 
+
 # تسجيل الخروج
 def logout_view(request):
     request.session.flush()
     messages.info(request, "تم تسجيل الخروج بنجاح.")
     return redirect('vote_login')
 
-# تصدير النتائج إلى Excel
+
+# تصدير نتائج أول جلسة نشطة إلى Excel
 def export_excel(request):
     session = VotingSession.objects.filter(expires_at__gt=timezone.now()).order_by('expires_at').first()
     if not session:
@@ -128,6 +146,7 @@ def export_excel(request):
     response['Content-Disposition'] = 'attachment; filename="vote_results.xlsx"'
     df.to_excel(response, index=False)
     return response
+
 
 # تصدير النتائج إلى PDF
 def export_pdf(request):
@@ -153,14 +172,17 @@ def export_pdf(request):
     pisa.CreatePDF(html, dest=response)
     return response
 
+
 # نسخة الطباعة
 def vote_snapshot_view(request):
     return render(request, 'vote/vote_snapshot.html')
+
 
 # عرض الأعضاء في صفحة HTML
 def members_list_view(request):
     members = Member.objects.all().order_by('full_name')
     return TemplateResponse(request, 'vote/members_list.html', {'members': members})
+
 
 # تصدير الأعضاء إلى Excel
 def export_members_excel(request):
@@ -185,6 +207,7 @@ def export_members_excel(request):
     response['Content-Disposition'] = 'attachment; filename="members_list.xlsx"'
     df.to_excel(response, index=False)
     return response
+
 
 # صفحة طباعة الأعضاء
 def members_print_view(request):

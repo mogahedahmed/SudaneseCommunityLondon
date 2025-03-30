@@ -5,9 +5,11 @@
 {% block content %}
 <div class="vote-section">
     <h2>{{ session.title }}</h2>
+
     {% if session.description %}
         <p>{{ session.description }}</p>
     {% endif %}
+
     <p><strong>ينتهي التصويت في:</strong> {{ session.expires_at|date:"Y-m-d H:i" }}</p>
 
     {% if messages %}
@@ -21,10 +23,10 @@
         <h4>نتائج التصويت الحالية:</h4>
         <ul>
             {% for result in results %}
-                {% with percent=result.count|divisibleby:total_votes|floatformat:2 %}
+                {% with percent=result.percent %}
                     <li>
                         {{ result.option__text }} - 
-                        {{ result.count }} صوت ({{ result.count|divisibleby:total_votes|floatformat:2 }}%)
+                        {{ result.count }} صوت ({{ percent }}%)
                     </li>
                 {% endwith %}
             {% endfor %}

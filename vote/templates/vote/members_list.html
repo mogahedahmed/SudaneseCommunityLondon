@@ -11,8 +11,13 @@
 
 <div style="direction: rtl;">
     <h1>👥 قائمة الأعضاء</h1>
-    <a href="{% url 'export_members_excel' %}" class="button" style="margin-bottom: 15px; display: inline-block;">⬇️ تحميل Excel</a>
-    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+
+    <div style="margin-bottom: 15px;">
+        <input type="text" id="memberSearch" placeholder="🔍 ابحث عن عضو..." style="padding: 8px; width: 300px; border-radius: 5px; border: 1px solid #ccc;">
+        <a href="{% url 'export_members_excel' %}" class="button" style="margin-right: 20px;">⬇️ تحميل Excel</a>
+    </div>
+
+    <table id="membersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">
         <thead style="background: #333; color: white;">
             <tr>
                 <th>رقم العضوية</th>
@@ -43,4 +48,16 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    document.getElementById('memberSearch').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#membersTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+
 {% endblock %}
