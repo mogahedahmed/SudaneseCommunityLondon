@@ -7,8 +7,12 @@
     <h2>صفحة التصويت 🗳️</h2>
 
     <!-- ✅ رسالة الترحيب تمت إضافتها هنا -->
-    <h3 style="text-align: center; margin-bottom: 20px; color: #444;">
-        👋 مرحبًا {{ full_name }}، أهلاً بك في صفحة التصويت!
+    <h3 style="text-align: center; margin-bottom: 20px; color: #444; direction: rtl;">
+        👋 مرحبًا 
+        <span style="display: inline-block; direction: ltr; unicode-bidi: embed; font-weight: bold; color: #000;">
+            {{ full_name }}
+        </span>،
+        أهلاً بك في صفحة التصويت!
     </h3>
 
     {% for data in sessions_data %}
