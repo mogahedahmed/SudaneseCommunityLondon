@@ -6,6 +6,11 @@
 <div class="vote-section">
     <h2>صفحة التصويت 🗳️</h2>
 
+    <!-- ✅ رسالة الترحيب تمت إضافتها هنا -->
+    <h3 style="text-align: center; margin-bottom: 20px; color: #444;">
+        👋 مرحبًا {{ full_name }}، أهلاً بك في صفحة التصويت!
+    </h3>
+
     {% for data in sessions_data %}
         <div class="vote-session-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
             <h3>{{ data.session.title }}</h3>
@@ -60,21 +65,37 @@
                 <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
 
             {% else %}
-                <!-- نموذج التصويت -->
-                <form method="post" class="vote-form">
+                <!-- نموذج التصويت (تم تحديثه) -->
+                <form method="post" class="vote-form" style="margin-top: 15px;">
                     {% csrf_token %}
                     <input type="hidden" name="session_id" value="{{ data.session.id }}">
-                    <ul>
+
+                    <ul style="list-style: none; padding: 0; margin: 10px 0;">
                         {% for option in data.options %}
-                            <li>
-                                <label>
-                                    <input type="radio" name="option" value="{{ option.id }}" required>
+                            <li style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" id="option-{{ option.id }}" name="option" value="{{ option.id }}" required
+                                       style="width: 18px; height: 18px;">
+                                <label for="option-{{ option.id }}" 
+                                       style="margin-right: 10px; font-size: 15px; cursor: pointer;">
                                     {{ option.text }}
                                 </label>
                             </li>
                         {% endfor %}
                     </ul>
-                    <button type="submit" class="vote-btn">تصويت</button>
+
+                    <button type="submit" class="vote-btn" style="
+                        background: #e53935;
+                        border: none;
+                        padding: 10px 20px;
+                        color: white;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: 0.3s;
+                        width: 100%;
+                    " onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'">
+                        تصويت
+                    </button>
                 </form>
             {% endif %}
         </div>
