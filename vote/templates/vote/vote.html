@@ -11,19 +11,16 @@
         </a>
     </div>
 
-    <!-- ترحيب بالعضو -->
     {% if full_name %}
         <h2 style="text-align: center; color: #fff;">مرحباً، {{ full_name }} 👋</h2>
     {% endif %}
 
-    <!-- تنبيه في حال لا يحق له التصويت -->
     {% if can_vote == "لا" %}
         <div style="background: #fff3cd; padding: 15px; border: 1px solid #ffeeba; border-radius: 8px; color: #856404; margin: 20px 0;">
             ⚠️ لا يحق لك التصويت. يمكنك فقط مشاهدة نتائج التصويت. لمزيد من التفاصيل، يرجى مراجعة إدارة الجالية.
         </div>
     {% endif %}
 
-    <!-- عرض جلسات التصويت -->
     {% if sessions_data|length == 0 %}
         <h3 style="color: #fff;">🚫 لا توجد جلسات تصويت نشطة حالياً</h3>
         <p style="color: #ccc;">يرجى الرجوع لاحقاً عند توفر جلسات تصويت.</p>
@@ -44,11 +41,11 @@
                         <p style="font-size: 14px; color: #ddd;">{{ data.session.description }}</p>
                     {% endif %}
 
-                    <p style="font-size: 13px;">⏰ <strong>ينتهي التصويت:</strong> {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
+                    <p style="font-size: 13px;">📅 <strong>مدة التصويت:</strong> من {{ data.session.created_at|date:"Y-m-d H:i" }} إلى {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
                     <p style="font-size: 13px;">📂 <strong>النوع:</strong> {{ data.session.category }}</p>
 
                     {% if data.session.expires_at < now %}
-                        <div style="background: #ffcdd2; padding: 15px; border: 1px solid #e57373; border-radius: 8px; color: #b71c1c; margin-bottom: 10px;">
+                        <div class="vote-closed-alert">
                             ⏰ انتهى وقت التصويت لهذه الجلسة. لا يمكنك التصويت، ولكن يمكنك مشاهدة النتائج أدناه.
                         </div>
                         <h4 style="margin-top: 10px;">📊 النتائج:</h4>
@@ -57,6 +54,7 @@
                                 <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
                             {% endfor %}
                         </ul>
+                        <p style="font-size: 12px; color: #ccc; margin-top: 8px;">👥 عدد المصوتين: {{ data.total_votes }}</p>
 
                     {% elif data.already_voted %}
                         <p style="color: #4caf50; font-weight: bold;">✅ تم التصويت</p>
@@ -66,6 +64,7 @@
                                 <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
                             {% endfor %}
                         </ul>
+                        <p style="font-size: 12px; color: #ccc; margin-top: 8px;">👥 عدد المصوتين: {{ data.total_votes }}</p>
 
                     {% elif can_vote == "لا" %}
                         <h4 style="margin-top: 10px;">📊 النتائج:</h4>
@@ -74,12 +73,12 @@
                                 <li style="font-size: 13px;">📌 {{ result.option__text }} - {{ result.count }} صوت ({{ result.percent }}%)</li>
                             {% endfor %}
                         </ul>
+                        <p style="font-size: 12px; color: #ccc; margin-top: 8px;">👥 عدد المصوتين: {{ data.total_votes }}</p>
 
                     {% else %}
                         <form method="post" class="vote-form" style="margin-top: 10px;">
                             {% csrf_token %}
                             <input type="hidden" name="session_id" value="{{ data.session.id }}">
-
                             <ul style="list-style: none; padding: 0; margin: 10px 0;">
                                 {% for option in data.options %}
                                     <li style="margin-bottom: 10px;">
@@ -90,7 +89,6 @@
                                     </li>
                                 {% endfor %}
                             </ul>
-
                             <button type="submit" class="vote-btn" style="
                                 background: #e53935;
                                 border: none;

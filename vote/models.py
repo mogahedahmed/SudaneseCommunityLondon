@@ -19,6 +19,7 @@ class Member(models.Model):
     def __str__(self):
         return f"{self.full_name} ({self.member_id})"
 
+
 class FamilyMember(models.Model):
     member = models.ForeignKey(Member, related_name='family_members_data', on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
@@ -29,6 +30,7 @@ class FamilyMember(models.Model):
     def __str__(self):
         return f"{self.full_name} ({self.relationship})"
 
+
 class VotingSession(models.Model):
     CATEGORY_CHOICES = [
         ('منصب إداري', 'منصب إداري'),
@@ -38,7 +40,10 @@ class VotingSession(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, verbose_name="نوع التصويت (اكتب يدويًا)")
+    
+    # ✅ تم إضافة هذا الحقل لعرض تاريخ بداية التصويت
     created_at = models.DateTimeField(auto_now_add=True)
+    
     expires_at = models.DateTimeField()
 
     def is_active(self):
@@ -47,12 +52,14 @@ class VotingSession(models.Model):
     def __str__(self):
         return f"{self.title} ({self.category})"
 
+
 class VotingOption(models.Model):
     session = models.ForeignKey(VotingSession, related_name='options', on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
 
     def __str__(self):
         return f"{self.text} ({self.session.title})"
+
 
 class Vote(models.Model):
     session = models.ForeignKey(VotingSession, on_delete=models.CASCADE)

@@ -859,6 +859,21 @@ footer {
     }
 }
 
+.vote-closed-alert {
+    background: #ffe5e5;
+    padding: 15px;
+    border-left: 6px solid #d32f2f;
+    border-radius: 8px;
+    color: #d32f2f;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    direction: rtl;
+}
+
+
+
 
 
   
