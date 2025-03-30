@@ -41,7 +41,8 @@
                         <p style="font-size: 14px; color: #ddd;">{{ data.session.description }}</p>
                     {% endif %}
 
-                    <p style="font-size: 13px;">📅 <strong>مدة التصويت:</strong> من {{ data.session.created_at|date:"Y-m-d H:i" }} إلى {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
+                    <p style="font-size: 13px;">📅 <strong>مدة التصويت:</strong> من {{ data.session.start_at|date:"Y-m-d H:i" }} إلى {{ data.session.expires_at|date:"Y-m-d H:i" }}</p>
+
                     <p style="font-size: 13px;">📂 <strong>النوع:</strong> {{ data.session.category }}</p>
 
                     {% if data.session.expires_at < now %}
