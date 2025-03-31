@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-your-secret-key'
 
 # Debug و Hosts
 DEBUG = True
-ALLOWED_HOSTS = ['sudanesecommunitylondon.onrender.com', '127.0.0.1']
+ALLOWED_HOSTS = ['sudanesecommunitylondon.pythonanywhere.com']
 
 # التطبيقات المثبتة
 INSTALLED_APPS = [
