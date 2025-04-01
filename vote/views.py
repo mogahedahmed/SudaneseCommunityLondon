@@ -17,7 +17,7 @@ def vote_login(request):
 
 # التحقق من العضو وتخزين معلومات الجلسة
 def vote_access(request):
-   if request.method == "POST":
+    if request.method == "POST":
         member_id = request.POST.get('member_id')
         password = request.POST.get('password')
 
@@ -71,7 +71,6 @@ def vote_page(request):
         session_id = request.POST.get("session_id")
         option_id = request.POST.get("option")
 
-        # ✅ التحقق من أن القيم موجودة
         if not session_id or not option_id:
             messages.error(request, "يرجى تحديد خيار تصويت صالح.")
             return redirect('vote_page')
@@ -135,6 +134,34 @@ def vote_page(request):
         'can_vote': can_vote,
         'now': now(),
     })
+
+
+# تسجيل الخروج
+def logout_view(request):
+    member_id = request.session.get('member_id')
+
+    # ✅ تحديث حالة العضو
+    if member_id:
+        try:
+            member = Member.objects.get(member_id=member_id)
+            member.is_logged_in = False
+            member.save()
+        except Member.DoesNotExist:
+            pass
+
+    # ✅ حذف الجلسة من قاعدة البيانات
+    session_key = request.session.session_key
+    if session_key:
+        try:
+            Session.objects.get(session_key=session_key).delete()
+        except Session.DoesNotExist:
+            pass
+
+    # ✅ حذف الجلسة من المتصفح
+    request.session.flush()
+    messages.info(request, "تم تسجيل الخروج بنجاح.")
+    return redirect('vote_login')
+
 
 # تصدير نتائج أول جلسة نشطة إلى Excel
 def export_excel(request):
@@ -223,20 +250,3 @@ def export_members_excel(request):
 def members_print_view(request):
     members = Member.objects.all()
     return render(request, 'vote/members_print.html', {'members': members})
-
-def logout_view(request):
-    member_id = request.session.get('member_id')
-    
-    # 👈 تأكد من حفظ حالة تسجيل الخروج قبل حذف الجلسة
-    if member_id:
-        try:
-            member = Member.objects.get(member_id=member_id)
-            member.is_logged_in = False
-            member.save()
-        except Member.DoesNotExist:
-            pass
-
-    # 👈 بعد تحديث الحالة، نحذف الجلسة
-    request.session.flush()
-    messages.info(request, "تم تسجيل الخروج بنجاح.")
-    return redirect('vote_login')
