@@ -23,11 +23,12 @@ INSTALLED_APPS = [
 
     # التطبيقات الخاصة بك
     'main',
-    'vote',
     'news',
     'contact',
     'activities',
     'regulations',
+    'vote.apps.VoteConfig',
+
 ]
 
 # الوسطاء Middleware
