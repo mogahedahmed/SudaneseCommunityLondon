@@ -235,14 +235,17 @@ def members_print_view(request):
 
 def logout_view(request):
     member_id = request.session.get('member_id')
+    
+    # 👈 تأكد من حفظ حالة تسجيل الخروج قبل حذف الجلسة
     if member_id:
         try:
             member = Member.objects.get(member_id=member_id)
             member.is_logged_in = False
             member.save()
         except Member.DoesNotExist:
-            pass  # في حالة عدم وجود العضو لا نفعل شيء
+            pass
 
+    # 👈 بعد تحديث الحالة، نحذف الجلسة
     request.session.flush()
     messages.info(request, "تم تسجيل الخروج بنجاح.")
     return redirect('vote_login')
