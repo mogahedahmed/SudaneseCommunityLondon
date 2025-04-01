@@ -11,11 +11,9 @@ from xhtml2pdf import pisa
 import pandas as pd
 from django.utils.timezone import now
 
-
 # صفحة تسجيل الدخول
 def vote_login(request):
     return render(request, 'vote/vote_login.html')
-
 
 # التحقق من العضو وتخزين معلومات الجلسة
 def vote_access(request):
@@ -55,6 +53,7 @@ def vote_access(request):
         except Member.DoesNotExist:
             messages.error(request, "❌ رقم العضوية أو كلمة المرور غير صحيحة.")
             return redirect('vote_login')
+
     return redirect('vote_login')
 
 
