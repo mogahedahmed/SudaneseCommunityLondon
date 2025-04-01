@@ -25,10 +25,27 @@ def vote_access(request):
         try:
             member = Member.objects.get(member_id=member_id, password=password)
 
+            # تحقق مما إذا كانت هناك جلسة قديمة للعضو
             if member.is_logged_in:
-                messages.error(request, "⚠️ أنت متصل حاليًا بصفحة التصويت من جهاز آخر. الرجاء تسجيل الخروج ثم معاودة المحاولة.")
-                return redirect('vote_login')
+                # نحاول التأكد إذا كان الجلسة السابقة ما زالت فعالة
+                sessions = Session.objects.filter(expire_date__gte=timezone.now())
+                is_session_active = False
 
+                for session in sessions:
+                    data = session.get_decoded()
+                    if data.get('member_id') == member.member_id:
+                        is_session_active = True
+                        break
+
+                if is_session_active:
+                    messages.error(request, "⚠️ هذا الحساب مستخدم حالياً من جهاز آخر.")
+                    return redirect('vote_login')
+                else:
+                    # الجلسة القديمة منتهية، نسمح بتسجيل الدخول
+                    member.is_logged_in = False
+                    member.save()
+
+            # حفظ الجلسة الحالية
             request.session['member_id'] = member.member_id
             request.session['full_name'] = member.full_name
             request.session['phone'] = member.phone
