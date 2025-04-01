@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.db.models import Count
+from django.contrib.sessions.models import Session
 from .models import VotingSession, VotingOption, Vote, Member
 from xhtml2pdf import pisa
 import pandas as pd
@@ -25,27 +26,26 @@ def vote_access(request):
         try:
             member = Member.objects.get(member_id=member_id, password=password)
 
-            # تحقق مما إذا كانت هناك جلسة قديمة للعضو
             if member.is_logged_in:
-                # نحاول التأكد إذا كان الجلسة السابقة ما زالت فعالة
+                # التحقق من وجود جلسة نشطة بنفس العضو
                 sessions = Session.objects.filter(expire_date__gte=timezone.now())
-                is_session_active = False
+                session_still_active = False
 
                 for session in sessions:
                     data = session.get_decoded()
                     if data.get('member_id') == member.member_id:
-                        is_session_active = True
+                        session_still_active = True
                         break
 
-                if is_session_active:
-                    messages.error(request, "⚠️ هذا الحساب مستخدم حالياً من جهاز آخر.")
+                if session_still_active:
+                    messages.error(request, "⚠️ هذا الحساب قيد الاستخدام حالياً في جهاز آخر.")
                     return redirect('vote_login')
-                else:
-                    # الجلسة القديمة منتهية، نسمح بتسجيل الدخول
-                    member.is_logged_in = False
-                    member.save()
 
-            # حفظ الجلسة الحالية
+                # لم توجد جلسة نشطة فعلاً، نعيد تفعيل الحساب
+                member.is_logged_in = False
+                member.save()
+
+            # ✅ تسجيل الدخول
             request.session['member_id'] = member.member_id
             request.session['full_name'] = member.full_name
             request.session['phone'] = member.phone
@@ -59,7 +59,6 @@ def vote_access(request):
         except Member.DoesNotExist:
             messages.error(request, "❌ رقم العضوية أو كلمة المرور غير صحيحة.")
             return redirect('vote_login')
-
     return redirect('vote_login')
 
 
