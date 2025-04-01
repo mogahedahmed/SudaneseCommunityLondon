@@ -24,22 +24,14 @@ def vote_access(request):
         try:
             member = Member.objects.get(member_id=member_id, password=password)
 
-            if member.is_logged_in:
-                # التحقق من وجود جلسة نشطة بنفس العضو (غير الجلسة الحالية)
-                sessions = Session.objects.filter(expire_date__gte=timezone.now())
-                other_session_active = False
+            # حذف كل الجلسات السابقة لهذا العضو (إن وجدت)
+            sessions = Session.objects.filter(expire_date__gte=timezone.now())
+            for session in sessions:
+                data = session.get_decoded()
+                if data.get('member_id') == member.member_id:
+                    session.delete()
 
-                for session in sessions:
-                    data = session.get_decoded()
-                    if data.get('member_id') == member.member_id and session.session_key != request.session.session_key:
-                        other_session_active = True
-                        break
-
-                if other_session_active:
-                    messages.error(request, "⚠️ هذا الحساب قيد الاستخدام حالياً في جهاز آخر.")
-                    return redirect('vote_login')
-
-            # ✅ تسجيل الدخول
+            # تسجيل الجلسة الجديدة
             request.session['member_id'] = member.member_id
             request.session['full_name'] = member.full_name
             request.session['phone'] = member.phone
