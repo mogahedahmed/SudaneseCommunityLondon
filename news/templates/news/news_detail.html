@@ -17,8 +17,9 @@
 
         <!-- الصورة إذا توفرت -->
         {% if news.image %}
-        <img src="{% static 'main/images/news/download.jpg' %}" alt="صورة الخبر" class="news-detail-img">
-        {% endif %}
+        {% if news.image %}
+    <img src="{{ news.image.url }}" alt="صورة الخبر" class="news-detail-img">
+{% endif %}
 
         <!-- محتوى الخبر -->
         <div class="news-full-content">
