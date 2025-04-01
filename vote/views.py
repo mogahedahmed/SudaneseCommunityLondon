@@ -17,28 +17,33 @@ def vote_login(request):
 
 # التحقق من العضو وتخزين معلومات الجلسة
 def vote_access(request):
-    if request.method == "POST":
+   if request.method == "POST":
         member_id = request.POST.get('member_id')
         password = request.POST.get('password')
 
         try:
             member = Member.objects.get(member_id=member_id, password=password)
 
-            # حذف كل الجلسات السابقة لهذا العضو (إن وجدت)
+            # ✅ نحذف كل الجلسات القديمة التي تخص هذا العضو
             sessions = Session.objects.filter(expire_date__gte=timezone.now())
             for session in sessions:
-                data = session.get_decoded()
-                if data.get('member_id') == member.member_id:
-                    session.delete()
+                try:
+                    data = session.get_decoded()
+                    if data.get('member_id') == member.member_id:
+                        session.delete()
+                except:
+                    continue
 
-            # تسجيل الجلسة الجديدة
+            # ✅ تحديث حالة الدخول
+            member.is_logged_in = True
+            member.save()
+
+            # ✅ تسجيل الجلسة الجديدة
+            request.session.flush()  # تنظيف أي جلسة حالية
             request.session['member_id'] = member.member_id
             request.session['full_name'] = member.full_name
             request.session['phone'] = member.phone
             request.session['can_vote'] = member.can_vote
-
-            member.is_logged_in = True
-            member.save()
 
             return redirect('vote_page')
 
