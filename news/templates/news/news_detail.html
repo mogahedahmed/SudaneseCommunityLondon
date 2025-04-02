@@ -17,8 +17,14 @@
 
         <!-- الصورة إذا توفرت -->
         {% if news.image %}
+<<<<<<< HEAD
         <img src="{{ news.image.url }}" alt="صورة الخبر" class="news-detail-img">
         {% endif %}
+=======
+        {% if news.image %}
+    <img src="{{ news.image.url }}" alt="صورة الخبر" class="news-detail-img">
+{% endif %}
+>>>>>>> cd7730b04ec81a6d27d6e1bda8e78803ee6a9bc6
 
         <!-- محتوى الخبر -->
         <div class="news-full-content">
