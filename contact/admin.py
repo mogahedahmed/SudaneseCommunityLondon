@@ -3,4 +3,12 @@ from .models import ContactInfo
 
 @admin.register(ContactInfo)
 class ContactInfoAdmin(admin.ModelAdmin):
-    list_display = ('email', 'phone')
+    list_display = (
+        'email',
+        'phone',
+        'whatsapp_link',
+        'address',
+        'facebook',
+        'twitter',
+        'instagram',
+    )

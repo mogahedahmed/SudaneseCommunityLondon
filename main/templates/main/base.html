@@ -7,6 +7,9 @@
     <title>{% block title %}الجالية السودانية - لندن أونتاريو{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
     <script src="{% static 'main/js/script.js' %}" defer></script>
+
+    <!-- مكتبة Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -38,7 +41,8 @@
 
 <!-- محتوى الصفحة -->
 <main>
-    {% block content %}{% endblock %}
+    {% block content %}
+    {% endblock %}
 </main>
 
 <!-- الفوتر -->

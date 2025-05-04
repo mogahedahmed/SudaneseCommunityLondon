@@ -1,13 +1,37 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %}تواصل معنا{% endblock %}
 
 {% block content %}
+<!-- عنوان الصفحة -->
 <div style="background-color:#800000; color:white; padding: 30px 15px; text-align: center;">
     <h1 style="font-size: 28px;">📞 تواصل معنا</h1>
     <p style="font-size: 16px; margin-top: 10px;">نسعد بتواصلكم معنا عبر الوسائل التالية</p>
+
+    {% if contact %}
+    <div style="margin-top: 20px;">
+        <h3 style="margin-bottom: 10px;">تابعنا</h3>
+        {% if contact.facebook %}
+        <a href="{{ contact.facebook }}" target="_blank" style="margin: 0 10px; color: #3b5998;">
+            <i class="fab fa-facebook fa-2x"></i>
+        </a>
+        {% endif %}
+        {% if contact.twitter %}
+        <a href="{{ contact.twitter }}" target="_blank" style="margin: 0 10px; color: #1da1f2;">
+            <i class="fab fa-twitter fa-2x"></i>
+        </a>
+        {% endif %}
+        {% if contact.instagram %}
+        <a href="{{ contact.instagram }}" target="_blank" style="margin: 0 10px; color: #e1306c;">
+            <i class="fab fa-instagram fa-2x"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 
+<!-- محتوى التواصل -->
 <div style="
     max-width: 900px;
     margin: 30px auto;
@@ -19,19 +43,18 @@
     line-height: 2;
     direction: rtl;
 ">
+    {% if contact %}
     <ul style="list-style: none; padding: 0;">
         <li>📧 <strong>البريد الإلكتروني:</strong>
             <a href="mailto:{{ contact.email }}" style="color:#90caf9; text-decoration: none;">
                 {{ contact.email }}
             </a>
         </li>
-
         <li>📞 <strong>الهاتف:</strong>
             <span style="direction: ltr; unicode-bidi: embed; color: #aed581; font-weight: bold;">
                 {{ contact.phone }}
             </span>
         </li>
-
         <li>💬 <strong>واتساب:</strong>
             <a href="{{ contact.whatsapp_link }}" 
                target="_blank" 
@@ -39,9 +62,9 @@
                اضغط هنا للمحادثة
             </a>
         </li>
-
         <li>📍 <strong>العنوان:</strong>
-            <a href="https://maps.google.com/?q={{ contact.address|urlencode }}"
+            <a href="https://www.google.com/maps/search/?api=1&query={{ contact.address|urlencode }}"
+               target="_blank" 
                style="color:#f48fb1; text-decoration: none;">
                 <span style="direction: ltr; unicode-bidi: embed;">
                     {{ contact.address }}
@@ -49,5 +72,6 @@
             </a>
         </li>
     </ul>
+    {% endif %}
 </div>
 {% endblock %}
