@@ -1,26 +1,43 @@
 from django.db import models
 from django.utils import timezone
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 class Member(models.Model):
-    member_id = models.CharField(max_length=20, unique=True)
+    member_id = models.CharField(max_length=20, unique=True, editable=False)
     full_name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10, choices=[('ذكر', 'ذكر'), ('أنثى', 'أنثى')])
+    address = models.CharField(max_length=255, blank=True)
     age = models.PositiveIntegerField()
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, unique=True)
     password = models.CharField(max_length=50)
-    marital_status = models.CharField(max_length=20, choices=[('أعزب', 'أعزب'), ('متزوج', 'متزوج')])
+
+    marital_status = models.CharField(max_length=20, choices=[
+        ('أعزب', 'أعزب'),
+        ('متزوج', 'متزوج'),
+        ('طالب', 'طالب')
+    ])
     family_members = models.PositiveIntegerField(default=0)
+    can_vote = models.CharField(max_length=5, choices=[('نعم', 'نعم'), ('لا', 'لا')], default='نعم')
 
-    CAN_VOTE_CHOICES = [('نعم', 'نعم'), ('لا', 'لا')]
-    can_vote = models.CharField(max_length=5, choices=CAN_VOTE_CHOICES, default='نعم', verbose_name="أحقية التصويت")
+    institution_number = models.CharField(max_length=20, blank=True)
+    transit_number = models.CharField(max_length=20, blank=True)
+    account_number = models.CharField(max_length=20, blank=True)
 
-    # ✅ حقل جديد لتتبع حالة تسجيل دخول العضو
-    is_logged_in = models.BooleanField(default=False, verbose_name="حالة تسجيل الدخول")
+    is_logged_in = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False, verbose_name="تمت الموافقة؟")
+    is_rejected = models.BooleanField(default=False, verbose_name="تم الرفض؟")
 
     def __str__(self):
         return f"{self.full_name} ({self.member_id})"
 
+@receiver(pre_save, sender=Member)
+def generate_member_id(sender, instance, **kwargs):
+    if not instance.member_id:
+        last_member = Member.objects.order_by('-id').first()
+        last_number = int(last_member.member_id.replace("M", "")) if last_member and last_member.member_id else 0
+        instance.member_id = f"M{last_number + 1:04d}"
 
 class FamilyMember(models.Model):
     member = models.ForeignKey(Member, related_name='family_members_data', on_delete=models.CASCADE)
@@ -32,7 +49,6 @@ class FamilyMember(models.Model):
     def __str__(self):
         return f"{self.full_name} ({self.relationship})"
 
-
 class VotingSession(models.Model):
     CATEGORY_CHOICES = [
         ('منصب إداري', 'منصب إداري'),
@@ -42,7 +58,6 @@ class VotingSession(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, verbose_name="نوع التصويت (اكتب يدويًا)")
-
     start_at = models.DateTimeField(default=timezone.now, verbose_name="وقت بداية التصويت")
     expires_at = models.DateTimeField(verbose_name="وقت انتهاء التصويت")
 
@@ -52,14 +67,12 @@ class VotingSession(models.Model):
     def __str__(self):
         return f"{self.title} ({self.category})"
 
-
 class VotingOption(models.Model):
     session = models.ForeignKey(VotingSession, related_name='options', on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
 
     def __str__(self):
         return f"{self.text} ({self.session.title})"
-
 
 class Vote(models.Model):
     session = models.ForeignKey(VotingSession, on_delete=models.CASCADE)

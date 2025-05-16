@@ -16,6 +16,7 @@ def vote_login(request):
     return render(request, 'vote/vote_login.html')
 
 # التحقق من العضو وتخزين معلومات الجلسة
+
 def vote_access(request):
     if request.method == "POST":
         member_id = request.POST.get('member_id')
@@ -24,7 +25,15 @@ def vote_access(request):
         try:
             member = Member.objects.get(member_id=member_id, password=password)
 
-            # ✅ نحذف كل الجلسات القديمة التي تخص هذا العضو
+            if member.is_rejected:
+                messages.error(request, "❌ تم رفض طلب عضويتك. يرجى مراجعة إدارة الجالية.")
+                return redirect('vote_login')
+
+            if not member.is_approved:
+                messages.warning(request, "⚠️ حسابك قيد المراجعة. يرجى انتظار موافقة الإدارة.")
+                return redirect('vote_login')
+
+            # حذف كل الجلسات القديمة التي تخص هذا العضو
             sessions = Session.objects.filter(expire_date__gte=timezone.now())
             for session in sessions:
                 try:
@@ -34,12 +43,12 @@ def vote_access(request):
                 except:
                     continue
 
-            # ✅ تحديث حالة الدخول
+            # تحديث حالة الدخول
             member.is_logged_in = True
             member.save()
 
-            # ✅ تسجيل الجلسة الجديدة
-            request.session.flush()  # تنظيف أي جلسة حالية
+            # تسجيل الجلسة الجديدة
+            request.session.flush()
             request.session['member_id'] = member.member_id
             request.session['full_name'] = member.full_name
             request.session['phone'] = member.phone
@@ -52,9 +61,6 @@ def vote_access(request):
             return redirect('vote_login')
 
     return redirect('vote_login')
-
-
-# صفحة التصويت لجميع الجلسات
 def vote_page(request):
     member_id = request.session.get('member_id')
     full_name = request.session.get('full_name')

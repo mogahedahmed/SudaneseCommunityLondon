@@ -1,3 +1,4 @@
+
 from django.contrib import admin
 from django.http import HttpResponse
 from .models import Member, VotingSession, VotingOption, Vote, FamilyMember
@@ -25,11 +26,12 @@ class MemberAdmin(admin.ModelAdmin):
     list_display = (
         'member_id', 'full_name', 'email', 'phone', 'gender',
         'age', 'marital_status', 'family_members', 'can_vote',
-        'print_button'
+        'is_logged_in', 'is_approved', 'is_rejected', 'print_button'
     )
     search_fields = ('member_id', 'full_name', 'email', 'phone')
-    list_filter = ('gender', 'marital_status', 'can_vote')
+    list_filter = ('gender', 'marital_status', 'can_vote', 'is_logged_in', 'is_approved', 'is_rejected')
     inlines = [FamilyMemberInline]
+    readonly_fields = ('member_id',)
 
     def print_button(self, obj):
         url = reverse('members_print')

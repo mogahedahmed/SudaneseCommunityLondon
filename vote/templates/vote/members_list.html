@@ -1,3 +1,4 @@
+
 {% extends 'admin/base_site.html' %}
 {% block title %}قائمة الأعضاء{% endblock %}
 
@@ -29,6 +30,7 @@
                 <th>الحالة الاجتماعية</th>
                 <th>عدد أفراد العائلة</th>
                 <th>أحقية التصويت</th>
+                <th>الحالة</th>
             </tr>
         </thead>
         <tbody>
@@ -43,6 +45,15 @@
                 <td>{{ member.marital_status }}</td>
                 <td>{{ member.family_members }}</td>
                 <td>{{ member.can_vote }}</td>
+                <td>
+                    {% if member.is_rejected %}
+                        🚫 مرفوض
+                    {% elif not member.is_approved %}
+                        ⏳ بانتظار الموافقة
+                    {% else %}
+                        ✅ نشط
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

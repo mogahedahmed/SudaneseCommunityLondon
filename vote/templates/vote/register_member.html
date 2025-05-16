@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل عضوية جديدة</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Tahoma;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .add-child-btn {
+            background: #4caf50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .submit-btn {
+            background: #d32f2f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+        }
+        .note {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>📝 تسجيل عضوية جديدة</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="color: red;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="form-section">
+        <h3>بيانات العضو</h3>
+        <input name="member_id" value="{{ next_member_id }}" readonly required style="background-color: #eee;">
+        <input name="full_name" placeholder="الاسم الكامل" required>
+        <select name="gender" required>
+            <option value="">الجنس</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+        </select>
+        <input name="address" placeholder="العنوان">
+        <input name="age" type="number" placeholder="العمر" required>
+        <input name="email" type="email" placeholder="البريد الإلكتروني" required>
+        <input name="phone" placeholder="رقم الهاتف" required>
+        <input name="password" type="password" placeholder="كلمة المرور" required>
+        <select name="marital_status" required>
+            <option value="">الحالة الاجتماعية</option>
+            <option value="أعزب">أعزب</option>
+            <option value="متزوج">متزوج</option>
+            <option value="طالب">طالب</option>
+        </select>
+        <input name="family_members" type="number" placeholder="عدد أفراد العائلة">
+        <select name="can_vote" required>
+            <option value="">أحقية التصويت</option>
+            <option value="نعم">نعم</option>
+            <option value="لا">لا</option>
+        </select>
+    </div>
+
+    <div class="form-section">
+        <h3>معلومات الحساب البنكي</h3>
+        <input name="institution_number" placeholder="Institution Number">
+        <input name="transit_number" placeholder="Transit Number">
+        <input name="account_number" placeholder="Account Number">
+    </div>
+
+    <div class="form-section">
+        <h3>أفراد العائلة</h3>
+        <div class="note">
+            ⚠️ يُرجى عدم تكرار أفراد العائلة في حساب الأب والأم معًا. إذا تم إدخال الأبناء في حساب أحد الزوجين، فلا داعي لإدخالهم مرة أخرى في حساب الآخر.
+        </div>
+        <div id="children-container"></div>
+        <button type="button" class="add-child-btn" onclick="addChild()">➕ إضافة فرد</button>
+    </div>
+
+    <button type="submit" class="submit-btn">إرسال الطلب</button>
+</form>
+
+<script>
+function addChild() {
+    const container = document.getElementById('children-container');
+    const div = document.createElement('div');
+    div.innerHTML = `
+        <input name="child_name[]" placeholder="اسم فرد العائلة" required>
+        <select name="child_gender[]" required>
+            <option value="">الجنس</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+        </select>
+        <input name="child_age[]" type="number" placeholder="العمر" required>
+        <input name="child_relation[]" placeholder="صلة القرابة" required>
+        <hr>
+    `;
+    container.appendChild(div);
+}
+</script>
+
+</body>
+</html>
