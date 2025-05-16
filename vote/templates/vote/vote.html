@@ -4,9 +4,21 @@
 
 {% block content %}
 <div class="vote-section">
-    <h2>صفحة التصويت 🗳️</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2>صفحة التصويت 🗳️</h2>
+        <a href="{% url 'vote_logout' %}" style="
+            background-color: #d32f2f;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        ">
+            🚪 تسجيل الخروج
+        </a>
+    </div>
 
-    <!-- ✅ رسالة الترحيب تمت إضافتها هنا -->
+    <!-- ✅ رسالة الترحيب -->
     <h3 style="text-align: center; margin-bottom: 20px; color: #ffc107; direction: rtl;">
         👋 مرحبًا 
         <span style="display: inline-block; direction: ltr; unicode-bidi: embed; font-weight: bold; color: #ffc107;">
@@ -26,8 +38,7 @@
             </p>
 
             {% if data.session.expires_at < now %}
-                <!-- التصويت منتهي -->
-                <div class="vote-closed-alert" style="background: #f8d7da; padding: 10px; border-radius: 6px; border: 1px solid #f5c6cb; color: #721c24;">
+                <div style="background: #f8d7da; padding: 10px; border-radius: 6px; border: 1px solid #f5c6cb; color: #721c24;">
                     ⏰ انتهى وقت التصويت. يمكنك مشاهدة النتائج.
                 </div>
                 <h4>📊 النتائج:</h4>
@@ -39,13 +50,11 @@
                 <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
 
             {% elif data.session.start_at > now %}
-                <!-- التصويت لم يبدأ بعد -->
-                <div class="vote-not-started-alert" style="background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; color: #856404;">
+                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; color: #856404;">
                     ⏳ التصويت لم يبدأ بعد. يبدأ في: {{ data.session.start_at|date:"Y-m-d H:i" }}
                 </div>
 
             {% elif data.already_voted %}
-                <!-- تم التصويت مسبقًا -->
                 <p style="color: #4caf50; font-weight: bold;">✅ تم التصويت</p>
                 <h4>📊 النتائج:</h4>
                 <ul>
@@ -56,8 +65,7 @@
                 <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
 
             {% elif can_vote == "لا" %}
-                <!-- لا يسمح له بالتصويت -->
-                <div class="vote-not-allowed-alert" style="background: #f8d7da; padding: 10px; border-radius: 6px; border: 1px solid #f5c6cb; color: #721c24;">
+                <div style="background: #f8d7da; padding: 10px; border-radius: 6px; border: 1px solid #f5c6cb; color: #721c24;">
                     ❌ لا يُسمح لك بالتصويت، ولكن يمكنك مشاهدة النتائج.
                 </div>
                 <h4>📊 النتائج:</h4>
@@ -69,7 +77,6 @@
                 <p>👥 عدد المصوتين: {{ data.total_votes }}</p>
 
             {% else %}
-                <!-- نموذج التصويت (تم تحديثه) -->
                 <form method="post" class="vote-form" style="margin-top: 15px;">
                     {% csrf_token %}
                     <input type="hidden" name="session_id" value="{{ data.session.id }}">
@@ -87,7 +94,7 @@
                         {% endfor %}
                     </ul>
 
-                    <button type="submit" class="vote-btn" style="
+                    <button type="submit" style="
                         background: #e53935;
                         border: none;
                         padding: 10px 20px;
