@@ -219,12 +219,15 @@ def register_member_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         phone = request.POST.get('phone')
+
         if Member.objects.filter(email=email).exists():
             messages.error(request, "❌ البريد الإلكتروني مستخدم مسبقًا. يرجى مراجعة الإدارة.")
             return redirect('register_member')
+
         if Member.objects.filter(phone=phone).exists():
             messages.error(request, "❌ رقم الهاتف مستخدم مسبقًا. يرجى مراجعة الإدارة.")
             return redirect('register_member')
+
         member = Member.objects.create(
             member_id=request.POST.get('member_id'),
             full_name=request.POST.get('full_name'),
@@ -237,16 +240,26 @@ def register_member_view(request):
             marital_status=request.POST.get('marital_status'),
             family_members=request.POST.get('family_members') or 0,
             can_vote=request.POST.get('can_vote'),
+
+            # ✅ الحقول الجديدة المضافة
+            payment_method=request.POST.get('payment_method'),
+            payment_period=request.POST.get('payment_period'),
             institution_number=request.POST.get('institution_number'),
             transit_number=request.POST.get('transit_number'),
             account_number=request.POST.get('account_number'),
+            bank_name=request.POST.get('bank_name'),
+            account_name=request.POST.get('account_name'),
+
             is_approved=False,
             is_rejected=False
         )
+
+        # ✅ أفراد العائلة
         children_names = request.POST.getlist('child_name[]')
         children_genders = request.POST.getlist('child_gender[]')
         children_ages = request.POST.getlist('child_age[]')
         children_relations = request.POST.getlist('child_relation[]')
+
         for name, gender, age, relation in zip(children_names, children_genders, children_ages, children_relations):
             FamilyMember.objects.create(
                 member=member,
@@ -255,6 +268,8 @@ def register_member_view(request):
                 age=int(age),
                 relationship=relation
             )
+
         messages.success(request, "✅ تم التسجيل بنجاح وسيتم تزويدك برقم العضوية عبر رسالة نصية أو البريد الإلكتروني، ومن ثم يمكنك تسجيل الدخول وممارسة حقوقك في التصويت.")
         return redirect('vote_login')
+
     return render(request, 'vote/register_member.html')

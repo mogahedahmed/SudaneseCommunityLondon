@@ -24,12 +24,18 @@ class FamilyMemberInline(admin.TabularInline):
 
 class MemberAdmin(admin.ModelAdmin):
     list_display = (
-        'member_id', 'full_name', 'email', 'phone', 'gender',
-        'age', 'marital_status', 'family_members', 'can_vote',
-        'is_logged_in', 'is_approved', 'is_rejected', 'print_button'
-    )
+    'member_id', 'full_name', 'email', 'phone', 'gender',
+    'age', 'marital_status', 'family_members', 'can_vote',
+    'payment_method', 'payment_period',
+    'is_logged_in', 'is_approved', 'is_rejected', 'print_button'
+)
+
     search_fields = ('member_id', 'full_name', 'email', 'phone')
-    list_filter = ('gender', 'marital_status', 'can_vote', 'is_logged_in', 'is_approved', 'is_rejected')
+    list_filter = (
+    'gender', 'marital_status', 'can_vote',
+    'payment_method', 'payment_period',
+    'is_logged_in', 'is_approved', 'is_rejected'
+)
     inlines = [FamilyMemberInline]
     readonly_fields = ('member_id',)
 

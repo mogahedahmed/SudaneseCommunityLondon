@@ -4,6 +4,17 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 class Member(models.Model):
+    PAYMENT_METHOD_CHOICES = [
+        ('VOID CHEQUE', 'VOID CHEQUE'),
+        ('E-TRANSFER', 'E-TRANSFER'),
+        ('CASH', 'CASH'),
+    ]
+
+    PAYMENT_PERIOD_CHOICES = [
+        ('شهري', 'شهري'),
+        ('سنوي', 'سنوي'),
+    ]
+
     member_id = models.CharField(max_length=20, unique=True, editable=False)
     full_name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10, choices=[('ذكر', 'ذكر'), ('أنثى', 'أنثى')])
@@ -21,9 +32,14 @@ class Member(models.Model):
     family_members = models.PositiveIntegerField(default=0)
     can_vote = models.CharField(max_length=5, choices=[('نعم', 'نعم'), ('لا', 'لا')], default='نعم')
 
+    # 🔻 الحقول الجديدة لطريقة الدفع
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, blank=True)
+    payment_period = models.CharField(max_length=10, choices=PAYMENT_PERIOD_CHOICES, blank=True)
     institution_number = models.CharField(max_length=20, blank=True)
     transit_number = models.CharField(max_length=20, blank=True)
     account_number = models.CharField(max_length=20, blank=True)
+    bank_name = models.CharField(max_length=100, blank=True)
+    account_name = models.CharField(max_length=100, blank=True)
 
     is_logged_in = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False, verbose_name="تمت الموافقة؟")
