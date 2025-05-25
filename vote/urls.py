@@ -20,9 +20,6 @@ urlpatterns = [
     path('members/export/', views.export_members_excel, name='export_members_excel'),
     path('members/print/', views.members_print_view, name='members_print'),
     path('register/', views.register_member_view, name='register_member'),
-    path('logout/', views.logout_view, name='vote_logout'),  
-    
-
 
     # نسخة الطباعة للأعضاء من لوحة الإدارة
     path('admin/members/print/', views.members_print_view, name='admin_members_print'),

@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.http import HttpResponse
 from .models import Member, VotingSession, VotingOption, Vote, FamilyMember
@@ -22,22 +21,56 @@ class FamilyMemberInline(admin.TabularInline):
     extra = 1
 
 
+@admin.action(description="📥 تصدير الأعضاء المحددين إلى Excel")
+def export_members_excel(modeladmin, request, queryset):
+    data = []
+    for member in queryset:
+        data.append({
+            "رقم العضوية": member.member_id,
+            "الاسم الكامل": member.full_name,
+            "الجنس": member.gender,
+            "العمر": member.age,
+            "الهاتف": member.phone,
+            "البريد": member.email,
+            "العنوان": member.address,
+            "الحالة الاجتماعية": member.marital_status,
+            "عدد أفراد العائلة": member.family_members,
+            "أحقية التصويت": member.can_vote,
+            "طريقة الدفع": member.payment_method,
+            "فترة السداد": member.payment_period,
+            "Institution Number": member.institution_number,
+            "Transit Number": member.transit_number,
+            "Account Number": member.account_number,
+            "Bank Name": member.bank_name,
+            "Account Name": member.account_name,
+            "تمت الموافقة؟": "نعم" if member.is_approved else "لا",
+            "تم الرفض؟": "نعم" if member.is_rejected else "لا",
+            "تسجيل الدخول": "نعم" if member.is_logged_in else "لا",
+        })
+
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="selected_members.xlsx"'
+    df.to_excel(response, index=False)
+    return response
+
+
 class MemberAdmin(admin.ModelAdmin):
     list_display = (
-    'member_id', 'full_name', 'email', 'phone', 'gender',
-    'age', 'marital_status', 'family_members', 'can_vote',
-    'payment_method', 'payment_period',
-    'is_logged_in', 'is_approved', 'is_rejected', 'print_button'
-)
-
+        'member_id', 'full_name', 'email', 'phone', 'gender',
+        'age', 'marital_status', 'family_members', 'can_vote',
+        'payment_method', 'payment_period',
+        'is_logged_in', 'is_approved', 'is_rejected', 'print_button'
+    )
     search_fields = ('member_id', 'full_name', 'email', 'phone')
     list_filter = (
-    'gender', 'marital_status', 'can_vote',
-    'payment_method', 'payment_period',
-    'is_logged_in', 'is_approved', 'is_rejected'
-)
+        'gender', 'marital_status', 'can_vote',
+        'payment_method', 'payment_period',
+        'is_logged_in', 'is_approved', 'is_rejected'
+    )
     inlines = [FamilyMemberInline]
     readonly_fields = ('member_id',)
+    actions = [export_members_excel]
 
     def print_button(self, obj):
         url = reverse('members_print')

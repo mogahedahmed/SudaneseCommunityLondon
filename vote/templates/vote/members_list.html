@@ -5,10 +5,15 @@
 {% block content %}
 
 <div style="margin-bottom: 20px; text-align: right;">
-    <a href="{% url 'members_print' %}" target="_blank" class="button" style="background-color: #d32f2f; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">
+    <a href="{% url 'members_print' %}" target="_blank" class="button" style="background-color: #d32f2f; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; margin-left: 10px;">
         🖨️ طباعة الأعضاء
     </a>
+
+    <a href="{% url 'export_members_excel' %}" class="button" style="background-color: #388e3c; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">
+        📥 تصدير Excel
+    </a>
 </div>
+
 
 <div style="direction: rtl;">
     <h1>👥 قائمة الأعضاء</h1>

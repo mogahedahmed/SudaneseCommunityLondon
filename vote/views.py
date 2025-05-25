@@ -188,6 +188,7 @@ def members_list_view(request):
     return TemplateResponse(request, 'vote/members_list.html', {'members': members})
 
 # تصدير الأعضاء إلى Excel
+# تصدير الأعضاء إلى Excel (نسخة النهائية الصحيحة فقط)
 def export_members_excel(request):
     members = Member.objects.all().order_by('full_name')
     data = []
@@ -195,19 +196,32 @@ def export_members_excel(request):
         data.append({
             "رقم العضوية": member.member_id,
             "الاسم الكامل": member.full_name,
-            "الهاتف": member.phone,
-            "البريد": member.email,
             "الجنس": member.gender,
             "العمر": member.age,
+            "الهاتف": member.phone,
+            "البريد": member.email,
+            "العنوان": member.address,
             "الحالة الاجتماعية": member.marital_status,
             "عدد أفراد العائلة": member.family_members,
             "أحقية التصويت": member.can_vote,
+            "طريقة الدفع": member.payment_method,
+            "فترة السداد": member.payment_period,
+            "Institution Number": member.institution_number,
+            "Transit Number": member.transit_number,
+            "Account Number": member.account_number,
+            "Bank Name": member.bank_name,
+            "Account Name": member.account_name,
+            "تمت الموافقة؟": "نعم" if member.is_approved else "لا",
+            "تم الرفض؟": "نعم" if member.is_rejected else "لا",
+            "تسجيل الدخول": "نعم" if member.is_logged_in else "لا",
         })
+
     df = pd.DataFrame(data)
     response = HttpResponse(content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="members_list.xlsx"'
+    response['Content-Disposition'] = 'attachment; filename="members_list_full.xlsx"'
     df.to_excel(response, index=False)
     return response
+    
 
 # صفحة طباعة الأعضاء
 def members_print_view(request):

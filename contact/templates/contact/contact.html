@@ -12,23 +12,21 @@
     {% if contact %}
     <div style="margin-top: 20px;">
         <h3 style="margin-bottom: 10px;">تابعنا</h3>
-        <div style="display: flex; justify-content: center; gap: 20px;">
-            {% if contact.facebook %}
-            <a href="{{ contact.facebook }}" target="_blank" style="color: #3b5998;">
-                <i class="fab fa-facebook fa-2x"></i>
-            </a>
-            {% endif %}
-            {% if contact.twitter %}
-            <a href="{{ contact.twitter }}" target="_blank" style="color: #1da1f2;">
-                <i class="fab fa-twitter fa-2x"></i>
-            </a>
-            {% endif %}
-            {% if contact.instagram %}
-            <a href="{{ contact.instagram }}" target="_blank" style="color: #e1306c;">
-                <i class="fab fa-instagram fa-2x"></i>
-            </a>
-            {% endif %}
-        </div>
+        {% if contact.facebook %}
+        <a href="{{ contact.facebook }}" target="_blank" style="margin: 0 10px; color: #3b5998;">
+            <i class="fab fa-facebook fa-2x"></i>
+        </a>
+        {% endif %}
+        {% if contact.twitter %}
+        <a href="{{ contact.twitter }}" target="_blank" style="margin: 0 10px; color: #1da1f2;">
+            <i class="fab fa-x-twitter fa-2x"></i>
+        </a>
+        {% endif %}
+        {% if contact.instagram %}
+        <a href="{{ contact.instagram }}" target="_blank" style="margin: 0 10px; color: #e1306c;">
+            <i class="fab fa-instagram fa-2x"></i>
+        </a>
+        {% endif %}
     </div>
     {% endif %}
 </div>
